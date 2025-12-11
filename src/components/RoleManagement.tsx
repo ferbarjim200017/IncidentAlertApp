@@ -9,6 +9,7 @@ interface RoleManagementProps {
 
 const RoleManagement: React.FC<RoleManagementProps> = ({ currentUser }) => {
   const [roles, setRoles] = useState<Role[]>([]);
+  const [userRole, setUserRole] = useState<Role | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -33,12 +34,33 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ currentUser }) => {
     return () => unsubscribe();
   }, []);
 
+  // Cargar rol del usuario actual
+  useEffect(() => {
+    const loadUserRole = async () => {
+      if (currentUser?.roleId) {
+        const role = await firebaseService.getRoleById(currentUser.roleId);
+        setUserRole(role);
+      }
+    };
+    loadUserRole();
+  }, [currentUser]);
+
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 5000);
   };
 
   const handleOpenModal = (role?: Role) => {
+    // Verificar permisos
+    if (!userRole?.permissions.roles.edit && role) {
+      showNotification('error', 'No tienes permisos para editar roles');
+      return;
+    }
+    if (!userRole?.permissions.roles.create && !role) {
+      showNotification('error', 'No tienes permisos para crear roles');
+      return;
+    }
+
     if (role) {
       setEditingRole(role);
       setFormData({
@@ -111,6 +133,12 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ currentUser }) => {
   };
 
   const handleDelete = async (role: Role) => {
+    // Verificar permisos
+    if (!userRole?.permissions.roles.delete) {
+      showNotification('error', 'No tienes permisos para eliminar roles');
+      return;
+    }
+
     if (!window.confirm(`¿Estás seguro de que deseas eliminar el rol "${role.name}"?`)) {
       return;
     }

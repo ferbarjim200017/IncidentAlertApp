@@ -1,5 +1,5 @@
 import { Incident, IncidentStatus, IncidentPriority, IncidentType } from '../types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CommentsSection } from './CommentsSection';
 import { TagsManager } from './TagsManager';
 import { PRManager } from './PRManager';
@@ -24,7 +24,7 @@ interface IncidentDetailProps {
 }
 
 export const IncidentDetail: React.FC<IncidentDetailProps> = ({
-  incident,
+  incident: incidentProp,
   onUpdate,
   onBack,
   onAddComment,
@@ -38,9 +38,18 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({
   onRemovePR,
   onUpdatePR,
 }) => {
+  const [incident, setIncident] = useState<Incident>(incidentProp);
   const [status, setStatus] = useState<IncidentStatus>(incident.status);
   const [priority, setPriority] = useState<IncidentPriority>(incident.priority);
   const [type, setType] = useState<IncidentType>(incident.type);
+
+  // Actualizar estado local cuando cambia el prop
+  useEffect(() => {
+    setIncident(incidentProp);
+    setStatus(incidentProp.status);
+    setPriority(incidentProp.priority);
+    setType(incidentProp.type);
+  }, [incidentProp]);
 
   // Obtener el nombre del usuario que creó la incidencia
   const getIncidentOwnerName = (): string => {
