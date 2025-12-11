@@ -100,9 +100,9 @@ export function UserManagement({ currentUser }: UserManagementProps) {
         return;
       }
 
-      // Crear usuario en Firebase
+      // Crear usuario en Firebase (username siempre en minúsculas)
       await firebaseService.addUser({
-        username: formData.username,
+        username: formData.username.toLowerCase(),
         password: formData.password,
         name: formData.name,
         avatar: formData.avatar,
