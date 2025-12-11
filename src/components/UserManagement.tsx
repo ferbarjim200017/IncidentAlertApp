@@ -277,21 +277,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
             </div>
 
             <div className="user-form-group">
-              <div className="avatar-selector">
-                {['👤', '👨', '👩', '🧑', '👨‍💼', '👩‍💼', '👨‍💻', '👩‍💻', '🦸', '🦸‍♀️', '🧙', '🧙‍♀️'].map(emoji => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    className={`avatar-option ${formData.avatar === emoji ? 'selected' : ''}`}
-                    onClick={() => setFormData({ ...formData, avatar: emoji })}
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="user-form-group">
               <label htmlFor="password">
                 {editingUser ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña *'}
               </label>

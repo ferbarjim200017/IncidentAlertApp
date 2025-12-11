@@ -348,7 +348,13 @@
   transition: all 0.3s ease;
   box-sizing: border-box;
   background: white;
+  color: #333;
   cursor: pointer;
+}
+
+.user-form-group select option {
+  color: #333;
+  background: white;
 }
 
 .user-form-group select:focus {
