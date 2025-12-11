@@ -17,7 +17,7 @@
 
 .comments-header h3 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: #333;
   font-weight: 700;
 }
@@ -26,16 +26,21 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 8px;
+  border-radius: 50%;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-add-comment:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.1);
   box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 

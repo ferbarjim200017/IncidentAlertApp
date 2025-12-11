@@ -132,8 +132,9 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
           <button 
             className="btn-add-comment"
             onClick={() => handleOpenModal()}
+            title="Añadir Comentario"
           >
-            + Añadir Comentario
+            +
           </button>
         </div>
 
@@ -155,13 +156,22 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
                   <span className="author-icon">👤</span>
                   <strong>{comment.author}</strong>
                 </div>
-                <span className="comment-date">
-                  {new Date(comment.createdAt).toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric'
-                  })}
-                </span>
+                <div className="comment-header-right">
+                  <span className="comment-date">
+                    {new Date(comment.createdAt).toLocaleDateString('es-ES', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </span>
+                  <button
+                    className="btn-delete-comment"
+                    onClick={(e) => handleDelete(e, comment.id)}
+                    title="Eliminar comentario"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             </div>
           ))
