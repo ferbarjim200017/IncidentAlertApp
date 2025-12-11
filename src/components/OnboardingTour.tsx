@@ -16,85 +16,41 @@ interface OnboardingTourProps {
 
 const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, onSkip }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
   const tourSteps: TourStep[] = [
     {
+      target: '.app-header',
+      title: '🎯 Bienvenido a Incident Manager',
+      content: 'Te guiaremos por las funciones principales de la aplicación para que puedas empezar rápidamente.',
+      position: 'bottom'
+    },
+    {
       target: '.tabs',
-      title: '🎯 Navegación Principal',
-      content: 'Usa estas pestañas para moverte entre las diferentes secciones de la aplicación.',
+      title: '📑 Navegación Principal',
+      content: 'Usa estas pestañas para moverte entre las diferentes secciones: Incidencias, Estadísticas y más.',
       position: 'bottom'
     },
     {
-      target: '.btn-new-incident',
-      title: '✨ Crear Incidencia',
-      content: 'Haz clic aquí para crear una nueva incidencia. También puedes usar el atajo de teclado "N".',
+      target: '.keyboard-shortcut-trigger',
+      title: '⌨️ Atajos de Teclado',
+      content: 'Presiona "?" para ver todos los atajos disponibles. Usa Ctrl+K para búsqueda rápida.',
       position: 'bottom'
-    },
-    {
-      target: '.incident-list',
-      title: '📋 Lista de Incidencias',
-      content: 'Aquí verás todas tus incidencias. Haz clic en cualquiera para ver los detalles.',
-      position: 'top'
-    },
-    {
-      target: '.advanced-search',
-      title: '🔍 Búsqueda Avanzada',
-      content: 'Usa los filtros para encontrar incidencias específicas. ¡Prueba Ctrl+K para búsqueda rápida!',
-      position: 'bottom'
-    },
-    {
-      target: '.user-profile',
-      title: '👤 Tu Perfil',
-      content: 'Gestiona tu cuenta y preferencias desde aquí.',
-      position: 'left'
     }
   ];
 
   useEffect(() => {
-    if (isActive && currentStep < tourSteps.length) {
-      updateTooltipPosition();
-      window.addEventListener('resize', updateTooltipPosition);
-      return () => window.removeEventListener('resize', updateTooltipPosition);
+    if (isActive) {
+      // Pequeño delay para que los elementos se rendericen
+      const timer = setTimeout(() => {
+        const step = tourSteps[currentStep];
+        const element = document.querySelector(step.target);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+      return () => clearTimeout(timer);
     }
   }, [isActive, currentStep]);
-
-  const updateTooltipPosition = () => {
-    const step = tourSteps[currentStep];
-    const element = document.querySelector(step.target);
-    
-    if (element) {
-      const rect = element.getBoundingClientRect();
-      const position = step.position || 'bottom';
-      
-      let top = 0;
-      let left = 0;
-
-      switch (position) {
-        case 'bottom':
-          top = rect.bottom + window.scrollY + 20;
-          left = rect.left + window.scrollX + rect.width / 2;
-          break;
-        case 'top':
-          top = rect.top + window.scrollY - 20;
-          left = rect.left + window.scrollX + rect.width / 2;
-          break;
-        case 'left':
-          top = rect.top + window.scrollY + rect.height / 2;
-          left = rect.left + window.scrollX - 20;
-          break;
-        case 'right':
-          top = rect.top + window.scrollY + rect.height / 2;
-          left = rect.right + window.scrollX + 20;
-          break;
-      }
-
-      setTooltipPosition({ top, left });
-
-      // Scroll al elemento
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
 
   const handleNext = () => {
     if (currentStep < tourSteps.length - 1) {
@@ -131,16 +87,10 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, o
         />
       )}
 
-      <div 
-        className={`tour-tooltip tour-tooltip-${step.position || 'bottom'}`}
-        style={{
-          top: `${tooltipPosition.top}px`,
-          left: `${tooltipPosition.left}px`,
-        }}
-      >
+      <div className="tour-tooltip-modal">
         <div className="tour-tooltip-header">
           <h3 className="tour-tooltip-title">{step.title}</h3>
-          <button className="tour-tooltip-close" onClick={onSkip}>✕</button>
+          <button className="tour-tooltip-close" onClick={onSkip} title="Cerrar tour">✕</button>
         </div>
         
         <div className="tour-tooltip-content">
@@ -149,7 +99,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, o
 
         <div className="tour-tooltip-footer">
           <div className="tour-progress">
-            {currentStep + 1} de {tourSteps.length}
+            Paso {currentStep + 1} de {tourSteps.length}
           </div>
           
           <div className="tour-actions">
@@ -157,7 +107,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, o
               className="tour-btn tour-btn-skip" 
               onClick={onSkip}
             >
-              Saltar
+              Saltar tour
             </button>
             
             {currentStep > 0 && (
@@ -165,7 +115,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, o
                 className="tour-btn tour-btn-secondary" 
                 onClick={handlePrevious}
               >
-                Anterior
+                ← Anterior
               </button>
             )}
             
@@ -173,7 +123,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, o
               className="tour-btn tour-btn-primary" 
               onClick={handleNext}
             >
-              {currentStep < tourSteps.length - 1 ? 'Siguiente' : 'Finalizar'}
+              {currentStep < tourSteps.length - 1 ? 'Siguiente →' : '✓ Finalizar'}
             </button>
           </div>
         </div>

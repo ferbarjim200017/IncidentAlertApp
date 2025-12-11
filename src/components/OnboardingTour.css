@@ -28,13 +28,17 @@
   }
 }
 
-.tour-tooltip {
-  position: absolute;
+/* Modal centrado en pantalla */
+.tour-tooltip-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: white;
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   z-index: 10000;
-  max-width: 400px;
+  max-width: 500px;
   width: calc(100vw - 2rem);
   animation: tooltipSlideIn 0.3s ease-out;
 }
@@ -42,66 +46,12 @@
 @keyframes tooltipSlideIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translate(-50%, -50%) scale(0.9);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, -50%) scale(1);
   }
-}
-
-.tour-tooltip-bottom {
-  transform: translateX(-50%);
-}
-
-.tour-tooltip-top {
-  transform: translateX(-50%) translateY(-100%);
-  margin-top: -20px;
-}
-
-.tour-tooltip-left {
-  transform: translateX(-100%) translateY(-50%);
-  margin-left: -20px;
-}
-
-.tour-tooltip-right {
-  transform: translateY(-50%);
-}
-
-.tour-tooltip::before {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 0;
-  border: 12px solid transparent;
-}
-
-.tour-tooltip-bottom::before {
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-bottom-color: white;
-}
-
-.tour-tooltip-top::before {
-  bottom: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-top-color: white;
-}
-
-.tour-tooltip-left::before {
-  right: -24px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-left-color: white;
-}
-
-.tour-tooltip-right::before {
-  left: -24px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-right-color: white;
 }
 
 .tour-tooltip-header {
@@ -122,22 +72,24 @@
 
 .tour-tooltip-close {
   background: rgba(239, 68, 68, 0.1);
-  border: none;
-  width: 28px;
-  height: 28px;
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   color: #dc2626;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
   flex-shrink: 0;
+  font-weight: 700;
 }
 
 .tour-tooltip-close:hover {
   background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
   transform: rotate(90deg);
 }
 
@@ -216,25 +168,23 @@
 
 /* Responsive */
 @media (max-width: 640px) {
-  .tour-tooltip {
-    position: fixed !important;
-    bottom: 1rem !important;
-    left: 1rem !important;
-    right: 1rem !important;
-    top: auto !important;
-    transform: none !important;
-    max-width: none;
-    width: auto !important;
-    margin: 0 !important;
+  .tour-tooltip-modal {
+    max-width: calc(100vw - 2rem);
+    margin: 1rem;
   }
 
-  .tour-tooltip::before {
-    display: none;
+  .tour-tooltip-header {
+    padding: 1rem 1.25rem 0.75rem 1.25rem;
+  }
+
+  .tour-tooltip-title {
+    font-size: 1.1rem;
   }
 
   .tour-tooltip-footer {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.75rem;
   }
 
   .tour-progress {
@@ -248,6 +198,11 @@
 
   .tour-btn {
     flex: 1;
+    font-size: 0.9rem;
+  }
+
+  .tour-btn-skip {
+    flex: 0 0 auto;
   }
 }
 
