@@ -181,6 +181,8 @@
   transition: all 0.2s ease;
   background: white;
   color: #333;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pr-form-modal input:focus,
