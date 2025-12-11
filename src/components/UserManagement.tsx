@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User } from '../types';
+import { User, Role } from '../types';
 import { authUtils } from '../authUtils';
 import * as firebaseService from '../firebaseService';
 import './UserManagement.css';
@@ -10,12 +10,17 @@ interface UserManagementProps {
 
 export function UserManagement({ currentUser }: UserManagementProps) {
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [userRoles, setUserRoles] = useState<Map<string, Role>>(new Map());
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     name: '',
+    email: '',
+    avatar: '👤',
+    roleId: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -32,13 +37,44 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     };
   }, []);
 
+  // Cargar roles disponibles
+  useEffect(() => {
+    const unsubscribe = firebaseService.subscribeToRoles((updatedRoles) => {
+      setRoles(updatedRoles);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  // Cargar información de roles para cada usuario
+  useEffect(() => {
+    const loadUserRoles = async () => {
+      const rolesMap = new Map<string, Role>();
+      for (const user of users) {
+        if (user.roleId) {
+          const role = await firebaseService.getRoleById(user.roleId);
+          if (role) {
+            rolesMap.set(user.id, role);
+          }
+        }
+      }
+      setUserRoles(rolesMap);
+    };
+
+    if (users.length > 0) {
+      loadUserRoles();
+    }
+  }, [users]);
+
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 3000);
   };
 
   const resetForm = () => {
-    setFormData({ username: '', password: '', name: '' });
+    setFormData({ username: '', password: '', name: '', email: '', avatar: '👤', roleId: '' });
     setShowCreateForm(false);
     setEditingUser(null);
     setShowPassword(false);
@@ -48,7 +84,12 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     e.preventDefault();
     
     if (!formData.username.trim() || !formData.password.trim() || !formData.name.trim()) {
-      showNotification('error', 'Todos los campos son obligatorios');
+      showNotification('error', 'Usuario, contraseña y nombre son obligatorios');
+      return;
+    }
+
+    if (!formData.roleId) {
+      showNotification('error', 'Debes seleccionar un rol para el usuario');
       return;
     }
 
@@ -65,6 +106,9 @@ export function UserManagement({ currentUser }: UserManagementProps) {
         username: formData.username,
         password: formData.password,
         name: formData.name,
+        email: formData.email || undefined,
+        avatar: formData.avatar,
+        roleId: formData.roleId,
         createdAt: new Date().toISOString()
       });
       
@@ -81,20 +125,33 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     
     if (!editingUser) return;
 
-    if (!formData.username.trim() || !formData.password.trim() || !formData.name.trim()) {
-      showNotification('error', 'Todos los campos son obligatorios');
+    if (!formData.name.trim()) {
+      showNotification('error', 'El nombre es obligatorio');
+      return;
+    }
+
+    if (!formData.roleId) {
+      showNotification('error', 'Debes seleccionar un rol para el usuario');
       return;
     }
 
     try {
-      // Actualizar usuario en Firebase
-      await firebaseService.updateUser(editingUser.id, {
-        username: formData.username,
-        password: formData.password,
+      const updates: Partial<User> = {
         name: formData.name,
-      });
+        email: formData.email || undefined,
+        avatar: formData.avatar,
+        roleId: formData.roleId,
+      };
+
+      // Solo actualizar contraseña si se proporciona una nueva
+      if (formData.password.trim()) {
+        updates.password = formData.password;
+      }
+
+      // Actualizar usuario en Firebase
+      await firebaseService.updateUser(editingUser.id, updates);
       
-      showNotification('success', `Usuario "${formData.username}" actualizado correctamente`);
+      showNotification('success', `Usuario "${editingUser.username}" actualizado correctamente`);
       resetForm();
     } catch (error) {
       console.error('Error updating user:', error);
@@ -106,8 +163,11 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     setEditingUser(user);
     setFormData({
       username: user.username,
-      password: user.password,
+      password: '', // No prellenar contraseña por seguridad
       name: user.name,
+      email: user.email || '',
+      avatar: user.avatar || '👤',
+      roleId: user.roleId || '',
     });
     setShowCreateForm(true);
   };
@@ -157,38 +217,92 @@ export function UserManagement({ currentUser }: UserManagementProps) {
           <form className="user-form" onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
             <h4>{editingUser ? '✏️ Editar Usuario' : '➕ Nuevo Usuario'}</h4>
             
-            <div className="user-form-group">
-              <label htmlFor="username">Usuario</label>
-              <input
-                id="username"
-                type="text"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                placeholder="Nombre de usuario"
-                disabled={!!editingUser}
-              />
+            <div className="user-form-row">
+              <div className="user-form-group">
+                <label htmlFor="username">Usuario *</label>
+                <input
+                  id="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  placeholder="Nombre de usuario"
+                  disabled={!!editingUser}
+                  required
+                />
+                {editingUser && <small className="field-hint">El usuario no se puede cambiar</small>}
+              </div>
+
+              <div className="user-form-group">
+                <label htmlFor="name">Nombre Completo *</label>
+                <input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Nombre completo del usuario"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="user-form-row">
+              <div className="user-form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="correo@ejemplo.com"
+                />
+              </div>
+
+              <div className="user-form-group">
+                <label htmlFor="roleId">Rol *</label>
+                <select
+                  id="roleId"
+                  value={formData.roleId}
+                  onChange={(e) => setFormData({ ...formData, roleId: e.target.value })}
+                  required
+                >
+                  <option value="">Seleccionar rol...</option>
+                  {roles.map(role => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="user-form-group">
-              <label htmlFor="name">Nombre Completo</label>
-              <input
-                id="name"
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nombre completo del usuario"
-              />
+              <label>Avatar</label>
+              <div className="avatar-selector">
+                {['👤', '👨', '👩', '🧑', '👨‍💼', '👩‍💼', '👨‍💻', '👩‍💻', '🦸', '🦸‍♀️', '🧙', '🧙‍♀️'].map(emoji => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    className={`avatar-option ${formData.avatar === emoji ? 'selected' : ''}`}
+                    onClick={() => setFormData({ ...formData, avatar: emoji })}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="user-form-group">
-              <label htmlFor="password">Contraseña</label>
+              <label htmlFor="password">
+                {editingUser ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña *'}
+              </label>
               <div className="password-input-wrapper">
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={editingUser ? "Nueva contraseña" : "Contraseña"}
+                  placeholder={editingUser ? "Nueva contraseña (opcional)" : "Contraseña"}
+                  required={!editingUser}
                 />
                 <label className="show-password-toggle">
                   <input
@@ -202,10 +316,10 @@ export function UserManagement({ currentUser }: UserManagementProps) {
             </div>
 
             <div className="user-form-actions">
-              <button type="submit" className="btn-submit" style={{ flex: '1 1 0', minWidth: 0, width: 'auto' }}>
+              <button type="submit" className="btn-submit">
                 {editingUser ? '💾 Guardar Cambios' : '➕ Crear Usuario'}
               </button>
-              <button type="button" className="btn-cancel" onClick={resetForm} style={{ flex: '1 1 0', minWidth: 0, width: 'auto' }}>
+              <button type="button" className="btn-cancel" onClick={resetForm}>
                 ✕ Cancelar
               </button>
             </div>
@@ -219,8 +333,11 @@ export function UserManagement({ currentUser }: UserManagementProps) {
           <table>
             <thead>
               <tr>
+                <th>Avatar</th>
                 <th>Usuario</th>
                 <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
                 <th>Fecha de Creación</th>
                 <th>Acciones</th>
               </tr>
@@ -229,12 +346,21 @@ export function UserManagement({ currentUser }: UserManagementProps) {
               {users.map(user => (
                 <tr key={user.id} className={user.id === currentUser.id ? 'current-user' : ''}>
                   <td>
+                    <span className="user-avatar">{user.avatar || '👤'}</span>
+                  </td>
+                  <td>
                     <span className="user-username">
                       {user.username}
                       {user.id === currentUser.id && <span className="badge-current"> (Tú)</span>}
                     </span>
                   </td>
                   <td>{user.name}</td>
+                  <td>{user.email || <span className="text-muted">Sin email</span>}</td>
+                  <td>
+                    <span className="role-badge">
+                      {userRoles.get(user.id)?.name || <span className="text-muted">Sin rol</span>}
+                    </span>
+                  </td>
                   <td>{new Date(user.createdAt).toLocaleDateString('es-ES')}</td>
                   <td>
                     <div className="user-actions">
