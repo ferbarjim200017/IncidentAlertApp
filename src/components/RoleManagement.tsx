@@ -111,11 +111,6 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ currentUser }) => {
   };
 
   const handleDelete = async (role: Role) => {
-    if (role.isSystem) {
-      showNotification('error', 'No se pueden eliminar roles del sistema');
-      return;
-    }
-
     if (!window.confirm(`¿Estás seguro de que deseas eliminar el rol "${role.name}"?`)) {
       return;
     }
@@ -205,14 +200,12 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ currentUser }) => {
               <button
                 className="btn-edit"
                 onClick={() => handleOpenModal(role)}
-                disabled={role.isSystem}
               >
                 Editar
               </button>
               <button
                 className="btn-delete"
                 onClick={() => handleDelete(role)}
-                disabled={role.isSystem}
               >
                 Eliminar
               </button>
