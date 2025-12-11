@@ -110,11 +110,6 @@ export function Login({ onLogin }: LoginProps) {
             Iniciar Sesión
           </button>
         </form>
-
-        <div className="login-footer">
-          <p>Usuario de prueba: <strong>admin</strong></p>
-          <p>Contraseña: <strong>admin123</strong></p>
-        </div>
       </div>
     </div>
   );
