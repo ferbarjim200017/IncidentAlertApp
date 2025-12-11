@@ -1,0 +1,44 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="globeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A9FD8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E5A8E;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E91E63;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#D81B60;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#AD1457;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="orangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFA726;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FB8C00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Globo terráqueo -->
+  <circle cx="160" cy="200" r="120" fill="url(#globeGradient)" />
+  
+  <!-- Continentes simplificados -->
+  <g fill="rgba(255,255,255,0.3)">
+    <ellipse cx="140" cy="170" rx="45" ry="35" transform="rotate(-20 140 170)" />
+    <ellipse cx="180" cy="190" rx="35" ry="25" transform="rotate(10 180 190)" />
+    <ellipse cx="160" cy="220" rx="30" ry="20" />
+  </g>
+  
+  <!-- Flecha diagonal dinámica -->
+  <path 
+    d="M 120 280 Q 180 240 240 180 L 260 200 L 280 170 L 250 150 L 230 170 L 250 190 Q 190 250 130 290 Z" 
+    fill="url(#arrowGradient)" 
+  />
+  
+  <!-- Elemento curvo naranja -->
+  <path 
+    d="M 280 240 Q 320 220 340 250 Q 350 280 320 300 Q 300 310 280 300" 
+    fill="url(#orangeGradient)" 
+  />
+  
+  <!-- Punto azul oscuro (acento) -->
+  <circle cx="340" cy="160" r="18" fill="#003B6F" />
+</svg>
