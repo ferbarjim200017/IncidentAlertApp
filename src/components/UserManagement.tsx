@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from '../types';
 import { authUtils } from '../authUtils';
+import * as firebaseService from '../firebaseService';
 import './UserManagement.css';
 
 interface UserManagementProps {
@@ -8,7 +9,7 @@ interface UserManagementProps {
 }
 
 export function UserManagement({ currentUser }: UserManagementProps) {
-  const [users, setUsers] = useState<User[]>(authUtils.getUsers());
+  const [users, setUsers] = useState<User[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
@@ -18,6 +19,18 @@ export function UserManagement({ currentUser }: UserManagementProps) {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Suscribirse a cambios en usuarios en tiempo real
+  useEffect(() => {
+    const unsubscribe = firebaseService.subscribeToUsers((updatedUsers) => {
+      console.log('Usuarios actualizados en tiempo real:', updatedUsers);
+      setUsers(updatedUsers);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -31,7 +44,7 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     setShowPassword(false);
   };
 
-  const handleCreateUser = (e: React.FormEvent) => {
+  const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.username.trim() || !formData.password.trim() || !formData.name.trim()) {
@@ -40,16 +53,30 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     }
 
     try {
-      const newUser = authUtils.createUser(formData.username, formData.password, formData.name);
-      setUsers(authUtils.getUsers());
-      showNotification('success', `Usuario "${newUser.username}" creado correctamente`);
+      // Verificar si el usuario ya existe
+      const existingUser = await firebaseService.getUserByUsername(formData.username.toLowerCase());
+      if (existingUser) {
+        showNotification('error', 'Ya existe un usuario con ese nombre');
+        return;
+      }
+
+      // Crear usuario en Firebase
+      await firebaseService.addUser({
+        username: formData.username,
+        password: formData.password,
+        name: formData.name,
+        createdAt: new Date().toISOString()
+      });
+      
+      showNotification('success', `Usuario "${formData.username}" creado correctamente`);
       resetForm();
     } catch (error) {
+      console.error('Error creating user:', error);
       showNotification('error', error instanceof Error ? error.message : 'Error al crear usuario');
     }
   };
 
-  const handleUpdateUser = (e: React.FormEvent) => {
+  const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!editingUser) return;
@@ -60,15 +87,17 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     }
 
     try {
-      authUtils.updateUser(editingUser.id, {
+      // Actualizar usuario en Firebase
+      await firebaseService.updateUser(editingUser.id, {
         username: formData.username,
         password: formData.password,
         name: formData.name,
       });
-      setUsers(authUtils.getUsers());
+      
       showNotification('success', `Usuario "${formData.username}" actualizado correctamente`);
       resetForm();
     } catch (error) {
+      console.error('Error updating user:', error);
       showNotification('error', error instanceof Error ? error.message : 'Error al actualizar usuario');
     }
   };
@@ -83,7 +112,7 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     setShowCreateForm(true);
   };
 
-  const handleDeleteUser = (user: User) => {
+  const handleDeleteUser = async (user: User) => {
     if (user.id === currentUser.id) {
       showNotification('error', 'No puedes eliminar tu propio usuario');
       return;
@@ -94,10 +123,11 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     }
 
     try {
-      authUtils.deleteUser(user.id);
-      setUsers(authUtils.getUsers());
+      // Eliminar usuario de Firebase
+      await firebaseService.deleteUser(user.id);
       showNotification('success', `Usuario "${user.username}" eliminado correctamente`);
     } catch (error) {
+      console.error('Error deleting user:', error);
       showNotification('error', error instanceof Error ? error.message : 'Error al eliminar usuario');
     }
   };
