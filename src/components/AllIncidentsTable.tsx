@@ -48,7 +48,28 @@ export const AllIncidentsTable: React.FC<AllIncidentsTableProps> = ({
         bValue = new Date(bValue as string).getTime() as any;
       }
 
-      // Manejar strings
+      // Manejar ordenación por nombre (comparación numérica si hay números)
+      if (field === 'name' && typeof aValue === 'string' && typeof bValue === 'string') {
+        // Extraer números del inicio del nombre
+        const aMatch = aValue.match(/^\d+/);
+        const bMatch = bValue.match(/^\d+/);
+        
+        if (aMatch && bMatch) {
+          // Si ambos tienen números, comparar numéricamente
+          const aNum = parseInt(aMatch[0], 10);
+          const bNum = parseInt(bMatch[0], 10);
+          
+          if (aNum !== bNum) {
+            return newDirection === 'asc' ? aNum - bNum : bNum - aNum;
+          }
+          // Si los números son iguales, comparar el resto alfabéticamente
+          return newDirection === 'asc' 
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+      }
+
+      // Manejar strings (otros campos)
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return newDirection === 'asc' 
           ? aValue.localeCompare(bValue)
