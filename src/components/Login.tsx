@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User } from '../types';
 import { Logo } from './Logo';
+import * as firebaseService from '../firebaseService';
 import './Login.css';
 
 interface LoginProps {
@@ -24,7 +25,7 @@ export function Login({ onLogin }: LoginProps) {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -33,26 +34,29 @@ export function Login({ onLogin }: LoginProps) {
       return;
     }
 
-    // Verificar credenciales
-    const usersData = localStorage.getItem('users');
-    const users: User[] = usersData ? JSON.parse(usersData) : [];
+    try {
+      // Buscar usuario en Firebase
+      const user = await firebaseService.getUserByUsername(username.toLowerCase());
 
-    const user = users.find(
-      u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
-    );
-
-    if (user) {
-      // Guardar credenciales si está marcado
-      if (rememberMe) {
-        localStorage.setItem('saved_username', username);
-        localStorage.setItem('saved_password', password);
+      if (user && user.password === password) {
+        // Guardar credenciales si está marcado
+        if (rememberMe) {
+          localStorage.setItem('saved_username', username);
+          localStorage.setItem('saved_password', password);
+        } else {
+          localStorage.removeItem('saved_username');
+          localStorage.removeItem('saved_password');
+        }
+        
+        // Guardar usuario en localStorage para sesión
+        localStorage.setItem('current_user', JSON.stringify(user));
+        onLogin(user);
       } else {
-        localStorage.removeItem('saved_username');
-        localStorage.removeItem('saved_password');
+        setError('Usuario o contraseña incorrectos');
       }
-      onLogin(user);
-    } else {
-      setError('Usuario o contraseña incorrectos');
+    } catch (error) {
+      console.error('Error durante login:', error);
+      setError('Error al iniciar sesión. Intenta nuevamente.');
     }
   };
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Incident, AutomationRule, User } from './types';
 import { storageUtils } from './storageUtils';
 import { authUtils } from './authUtils';
+import * as firebaseService from './firebaseService';
 import { IncidentForm } from './components/IncidentForm';
 import { IncidentList } from './components/IncidentList';
 import { IncidentEdit } from './components/IncidentEdit';
@@ -71,33 +72,40 @@ function App() {
   };
 
   useEffect(() => {
-    try {
-      // Inicializar usuario admin por defecto
-      authUtils.initializeDefaultUser();
-      
-      // Verificar si hay usuario autenticado
-      const user = authUtils.getCurrentUser();
-      setCurrentUser(user);
-      
-      const loadedIncidents = storageUtils.getIncidents();
-      setAllIncidents(loadedIncidents);
-      const loadedRules = storageUtils.getAutomationRules();
-      setAutomationRules(loadedRules);
+    const loadData = async () => {
+      try {
+        // Inicializar datos por defecto en Firebase
+        await firebaseService.initializeDefaultData();
+        
+        // Verificar si hay usuario autenticado
+        const user = authUtils.getCurrentUser();
+        setCurrentUser(user);
+        
+        // Cargar incidencias desde Firebase
+        const loadedIncidents = await firebaseService.getIncidents();
+        setAllIncidents(loadedIncidents);
+        
+        // Cargar reglas de automatización
+        const loadedRules = await firebaseService.getAutomationRules();
+        setAutomationRules(loadedRules);
 
-      // Verificar si hay un ID de incidencia en la URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const incidentId = urlParams.get('incident');
-      if (incidentId) {
-        const incident = loadedIncidents.find(inc => inc.id === incidentId);
-        if (incident) {
-          setSelectedIncident(incident);
-          setActiveTab('incident-detail');
+        // Verificar si hay un ID de incidencia en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const incidentId = urlParams.get('incident');
+        if (incidentId) {
+          const incident = loadedIncidents.find(inc => inc.id === incidentId);
+          if (incident) {
+            setSelectedIncident(incident);
+            setActiveTab('incident-detail');
+          }
         }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        setNotification({ type: 'error', message: 'Error al cargar los datos. Verifica la conexión.' });
       }
-    } catch (error) {
-      console.error('Error loading data:', error);
-      setNotification({ type: 'error', message: 'Error al cargar los datos. Verifica el formato del archivo importado.' });
-    }
+    };
+    
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -109,21 +117,28 @@ function App() {
     }
   }, [notification]);
 
-  const handleAddIncident = (incident: Incident) => {
+  const handleAddIncident = async (incident: Incident) => {
     try {
       // Asignar userId del usuario actual
       const incidentWithUser = { ...incident, userId: currentUser!.id };
       
       // Aplicar reglas de automatización al crear
       const processedIncident = storageUtils.applyAutomationRules(incidentWithUser, 'on-create');
-      const updated = storageUtils.addIncident(processedIncident);
+      
+      // Guardar en Firebase
+      await firebaseService.addIncident(processedIncident);
+      
+      // Recargar incidencias
+      const updated = await firebaseService.getIncidents();
       setAllIncidents(updated);
+      
       setNotification({
         type: 'success',
         message: `✓ Incidencia "${incident.name}" creada correctamente`,
         incidentId: incident.id,
       });
     } catch (error) {
+      console.error('Error adding incident:', error);
       setNotification({
         type: 'error',
         message: 'Error al crear la incidencia. Intenta nuevamente.',
@@ -131,40 +146,62 @@ function App() {
     }
   };
 
-  const handleUpdateIncident = (incident: Incident) => {
+  const handleUpdateIncident = async (incident: Incident) => {
     console.log('handleUpdateIncident llamado con:', incident);
-    const updated = storageUtils.updateIncident(incident.id, incident);
-    console.log('Incidentes actualizados:', updated);
-    setAllIncidents(updated);
-    setEditingIncident(null);
     
-    // Actualizar el incidente seleccionado con la versión actualizada
-    const updatedIncident = updated.find(inc => inc.id === incident.id);
-    if (updatedIncident && selectedIncident?.id === incident.id) {
-      setSelectedIncident(updatedIncident);
-      // Actualizar también en openIncidents si está abierto
-      setOpenIncidents(openIncidents.map(inc => 
-        inc.id === incident.id ? updatedIncident : inc
-      ));
+    try {
+      // Actualizar en Firebase
+      await firebaseService.updateIncident(incident.id, incident);
+      
+      // Recargar incidencias
+      const updated = await firebaseService.getIncidents();
+      console.log('Incidentes actualizados:', updated);
+      setAllIncidents(updated);
+      setEditingIncident(null);
+      
+      // Actualizar el incidente seleccionado con la versión actualizada
+      const updatedIncident = updated.find(inc => inc.id === incident.id);
+      if (updatedIncident && selectedIncident?.id === incident.id) {
+        setSelectedIncident(updatedIncident);
+        // Actualizar también en openIncidents si está abierto
+        setOpenIncidents(openIncidents.map(inc => 
+          inc.id === incident.id ? updatedIncident : inc
+        ));
+      }
+      
+      // Mostrar notificación de éxito
+      console.log('Mostrando notificación');
+      setNotification({
+        type: 'success',
+        message: `✓ Incidencia "${incident.name}" actualizada correctamente`,
+        incidentId: incident.id,
+      });
+    } catch (error) {
+      console.error('Error updating incident:', error);
+      setNotification({
+        type: 'error',
+        message: 'Error al actualizar la incidencia.',
+      });
     }
-    
-    // Mostrar notificación de éxito
-    console.log('Mostrando notificación');
-    setNotification({
-      type: 'success',
-      message: `✓ Incidencia "${incident.name}" actualizada correctamente`,
-      incidentId: incident.id,
-    });
   };
 
-  const handleDeleteIncident = (id: string) => {
-    const updated = storageUtils.deleteIncident(id);
-    setAllIncidents(updated);
-    // Remover de pestañas abiertas si está
-    setOpenIncidents(openIncidents.filter(inc => inc.id !== id));
-    if (selectedIncident?.id === id) {
-      setSelectedIncident(null);
-      setActiveTab('all-incidents');
+  const handleDeleteIncident = async (id: string) => {
+    try {
+      await firebaseService.deleteIncident(id);
+      const updated = await firebaseService.getIncidents();
+      setAllIncidents(updated);
+      // Remover de pestañas abiertas si está
+      setOpenIncidents(openIncidents.filter(inc => inc.id !== id));
+      if (selectedIncident?.id === id) {
+        setSelectedIncident(null);
+        setActiveTab('all-incidents');
+      }
+    } catch (error) {
+      console.error('Error deleting incident:', error);
+      setNotification({
+        type: 'error',
+        message: 'Error al eliminar la incidencia.',
+      });
     }
   };
 
@@ -184,16 +221,31 @@ function App() {
     }
   };
 
-  const handleAddComment = (incidentId: string, author: string, text: string) => {
-    const updated = storageUtils.addComment(incidentId, author, text);
-    setAllIncidents(updated);
-    
-    // Actualizar el incidente seleccionado si está abierto
-    if (selectedIncident && selectedIncident.id === incidentId) {
-      const updatedIncident = updated.find(inc => inc.id === incidentId);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
+  const handleAddComment = async (incidentId: string, author: string, text: string) => {
+    try {
+      // Crear comentario
+      const comment = {
+        incidentId,
+        author,
+        text,
+        timestamp: new Date().toISOString()
+      };
+      
+      await firebaseService.addComment(comment);
+      
+      // Recargar incidencias
+      const updated = await firebaseService.getIncidents();
+      setAllIncidents(updated);
+      
+      // Actualizar el incidente seleccionado si está abierto
+      if (selectedIncident && selectedIncident.id === incidentId) {
+        const updatedIncident = updated.find(inc => inc.id === incidentId);
+        if (updatedIncident) {
+          setSelectedIncident(updatedIncident);
+        }
       }
+    } catch (error) {
+      console.error('Error adding comment:', error);
     }
   };
 

@@ -7,7 +7,10 @@ export interface User {
   username: string;
   password: string;
   name: string;
-  createdAt: string;
+  role?: string;
+  avatar?: string;
+  email?: string;
+  createdAt?: string;
 }
 
 export interface Comment {
@@ -15,7 +18,8 @@ export interface Comment {
   incidentId: string;
   author: string;
   text: string;
-  createdAt: string;
+  timestamp?: string;
+  createdAt?: string;
 }
 
 export interface PR {
@@ -56,6 +60,13 @@ export interface Incident {
   relevante?: string;
   realizado?: string;
   clasesModificadas?: string;
+  timeTracking?: TimeEntry[];
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
 }
 
 export type AutomationTrigger = 'on-create' | 'on-status-change' | 'on-priority-change' | 'on-time-threshold';
