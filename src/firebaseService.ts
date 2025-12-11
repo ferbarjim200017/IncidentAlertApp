@@ -317,12 +317,11 @@ export const migrateUsersToRoleId = async () => {
     const snapshot = await getDocs(usersRef);
     const roles = await getRoles();
     
-    // Mapear nombres de roles antiguos a IDs de roles nuevos
+    // Obtener rol de Administrador
     const adminRole = roles.find(r => r.name === 'Administrador');
-    const userRole = roles.find(r => r.name === 'Usuario');
     
-    if (!adminRole || !userRole) {
-      console.log('❌ Roles no encontrados para migración');
+    if (!adminRole) {
+      console.log('❌ Rol Administrador no encontrado para migración');
       return;
     }
 
@@ -337,14 +336,13 @@ export const migrateUsersToRoleId = async () => {
         migratedCount++;
         console.log(`🔄 Migrando usuario "${userData.username}" de role: "${userData.role}" a roleId`);
         
-        let newRoleId = userRole.id; // Por defecto rol de usuario
+        // Asignar rol de Administrador a usuarios admin, y Administrador a todos por defecto
+        let newRoleId = adminRole.id;
         
-        // Mapear roles antiguos
         if (userData.role === 'admin' || userData.username === 'admin') {
-          newRoleId = adminRole.id;
           console.log(`   ➜ Asignando rol "Administrador" (${newRoleId})`);
         } else {
-          console.log(`   ➜ Asignando rol "Usuario" (${newRoleId})`);
+          console.log(`   ➜ Asignando rol "Administrador" por defecto (${newRoleId})`);
         }
         
         // Actualizar el documento sin el campo 'role' antiguo
@@ -356,13 +354,13 @@ export const migrateUsersToRoleId = async () => {
           })
         );
       } else if (!userData.roleId && !userData.role) {
-        // Usuario sin ningún rol, asignar rol de Usuario por defecto
+        // Usuario sin ningún rol, asignar rol de Administrador por defecto
         migratedCount++;
-        console.log(`🔄 Usuario "${userData.username}" sin rol, asignando rol "Usuario"`);
+        console.log(`🔄 Usuario "${userData.username}" sin rol, asignando rol "Administrador"`);
         const userDocRef = doc(db, 'users', docSnapshot.id);
         updates.push(
           updateDoc(userDocRef, {
-            roleId: userRole.id
+            roleId: adminRole.id
           })
         );
       }
