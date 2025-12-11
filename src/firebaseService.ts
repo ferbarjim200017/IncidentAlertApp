@@ -114,6 +114,22 @@ export const deleteComment = async (incidentId: string, commentId: string): Prom
   await updateIncident(incidentId, { comments: updatedComments });
 };
 
+export const updateComment = async (
+  incidentId: string,
+  commentId: string,
+  author: string,
+  text: string
+): Promise<void> => {
+  const incident = await getIncidentById(incidentId);
+  if (!incident) throw new Error('Incident not found');
+  
+  const updatedComments = incident.comments?.map(c =>
+    c.id === commentId ? { ...c, author, text } : c
+  );
+  
+  await updateIncident(incidentId, { comments: updatedComments });
+};
+
 // ============ TIME ENTRIES ============
 export const getTimeEntriesByIncident = async (incidentId: string): Promise<TimeEntry[]> => {
   const incident = await getIncidentById(incidentId);

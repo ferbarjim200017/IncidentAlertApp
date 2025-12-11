@@ -8,14 +8,17 @@ interface CommentsSectionProps {
   comments: Comment[];
   onAddComment: (incidentId: string, author: string, text: string) => void;
   onDeleteComment: (incidentId: string, commentId: string) => void;
+  onUpdateComment?: (incidentId: string, commentId: string, author: string, text: string) => void;
 }
 
-export function CommentsSection({ incidentId, comments, onAddComment, onDeleteComment }: CommentsSectionProps) {
+export function CommentsSection({ incidentId, comments, onAddComment, onDeleteComment, onUpdateComment }: CommentsSectionProps) {
   const [newComment, setNewComment] = useState('');
   const [author, setAuthor] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [editingComment, setEditingComment] = useState<Comment | null>(null);
 
-  const handleDelete = (commentId: string) => {
+  const handleDelete = (e: React.MouseEvent, commentId: string) => {
+    e.stopPropagation(); // Evitar que se abra el modal al eliminar
     if (window.confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
       onDeleteComment(incidentId, commentId);
     }
@@ -24,11 +27,36 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim() && author.trim()) {
-      onAddComment(incidentId, author.trim(), newComment.trim());
+      if (editingComment && onUpdateComment) {
+        onUpdateComment(incidentId, editingComment.id, author.trim(), newComment.trim());
+      } else {
+        onAddComment(incidentId, author.trim(), newComment.trim());
+      }
       setNewComment('');
       setAuthor('');
       setShowModal(false);
+      setEditingComment(null);
     }
+  };
+
+  const handleOpenModal = (comment?: Comment) => {
+    if (comment) {
+      setEditingComment(comment);
+      setAuthor(comment.author);
+      setNewComment(comment.text);
+    } else {
+      setEditingComment(null);
+      setAuthor('');
+      setNewComment('');
+    }
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingComment(null);
+    setAuthor('');
+    setNewComment('');
   };
 
   const sortedComments = [...comments].sort((a, b) => 
@@ -38,17 +66,17 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
   return (
     <>
       {showModal && createPortal(
-        <div className="comment-modal-overlay" onClick={() => setShowModal(false)}>
+        <div className="comment-modal-overlay" onClick={handleCloseModal}>
           <div className="comment-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>✍️ Nuevo Comentario</h2>
-              <button className="btn-close-modal" onClick={() => setShowModal(false)}>
+              <h2>{editingComment ? '✏️ Editar Comentario' : '✍️ Nuevo Comentario'}</h2>
+              <button className="btn-close-modal" onClick={handleCloseModal}>
                 ✕
               </button>
             </div>
             <form className="comment-form-modal" onSubmit={handleSubmit}>
               <div className="form-group-modal">
-                <label htmlFor="author">Tu nombre</label>
+                <label htmlFor="author">Autor</label>
                 <input
                   id="author"
                   type="text"
@@ -73,11 +101,23 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
                 />
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn-cancel-modal" onClick={() => setShowModal(false)}>
+                <button type="button" className="btn-cancel-modal" onClick={handleCloseModal}>
                   Cancelar
                 </button>
+                {editingComment && (
+                  <button 
+                    type="button" 
+                    className="btn-delete-modal" 
+                    onClick={(e) => {
+                      handleDelete(e, editingComment.id);
+                      handleCloseModal();
+                    }}
+                  >
+                    🗑️ Eliminar
+                  </button>
+                )}
                 <button type="submit" className="btn-submit-modal">
-                  📝 Publicar Comentario
+                  {editingComment ? '💾 Guardar' : '📝 Publicar'}
                 </button>
               </div>
             </form>
@@ -91,7 +131,7 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
           <h3>💬 Comentarios ({comments.length})</h3>
           <button 
             className="btn-add-comment"
-            onClick={() => setShowModal(true)}
+            onClick={() => handleOpenModal()}
           >
             + Añadir Comentario
           </button>
@@ -105,33 +145,23 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
           </div>
         ) : (
           sortedComments.map((comment) => (
-            <div key={comment.id} className="comment-item">
+            <div 
+              key={comment.id} 
+              className="comment-item"
+              onClick={() => handleOpenModal(comment)}
+            >
               <div className="comment-header">
                 <div className="comment-author">
                   <span className="author-icon">👤</span>
                   <strong>{comment.author}</strong>
                 </div>
-                <div className="comment-header-right">
-                  <span className="comment-date">
-                    {new Date(comment.createdAt).toLocaleString('es-ES', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                  <button
-                    className="btn-delete-comment"
-                    onClick={() => handleDelete(comment.id)}
-                    title="Eliminar comentario"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-              <div className="comment-text">
-                {comment.text}
+                <span className="comment-date">
+                  {new Date(comment.createdAt).toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  })}
+                </span>
               </div>
             </div>
           ))

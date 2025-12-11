@@ -271,16 +271,19 @@ function App() {
     }
   };
 
-  const handleDeleteComment = (incidentId: string, commentId: string) => {
-    const updated = storageUtils.deleteComment(incidentId, commentId);
-    setAllIncidents(updated);
-    
-    // Actualizar el incidente seleccionado si está abierto
-    if (selectedIncident && selectedIncident.id === incidentId) {
-      const updatedIncident = updated.find(inc => inc.id === incidentId);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
-      }
+  const handleUpdateComment = async (incidentId: string, commentId: string, author: string, text: string) => {
+    try {
+      await firebaseService.updateComment(incidentId, commentId, author, text);
+    } catch (error) {
+      console.error('Error updating comment:', error);
+    }
+  };
+
+  const handleDeleteComment = async (incidentId: string, commentId: string) => {
+    try {
+      await firebaseService.deleteComment(incidentId, commentId);
+    } catch (error) {
+      console.error('Error deleting comment:', error);
     }
   };
 
@@ -591,6 +594,7 @@ function App() {
             incident={selectedIncident}
             onUpdate={handleUpdateIncident}
             onAddComment={handleAddComment}
+            onUpdateComment={handleUpdateComment}
             onDeleteComment={handleDeleteComment}
             onDelete={handleDeleteIncident}
             onAddTag={handleAddTag}

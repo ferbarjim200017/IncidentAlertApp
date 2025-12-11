@@ -12,6 +12,7 @@ interface IncidentDetailProps {
   onUpdate: (incident: Incident) => void;
   onBack: () => void;
   onAddComment: (incidentId: string, author: string, text: string) => void;
+  onUpdateComment: (incidentId: string, commentId: string, author: string, text: string) => void;
   onDeleteComment: (incidentId: string, commentId: string) => void;
   onDelete: (id: string) => void;
   onAddTag: (incidentId: string, tag: string) => void;
@@ -28,6 +29,7 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({
   onUpdate,
   onBack,
   onAddComment,
+  onUpdateComment,
   onDeleteComment,
   onDelete,
   onAddTag,
@@ -360,6 +362,7 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({
               incidentId={incident.id}
               comments={incident.comments || []}
               onAddComment={onAddComment}
+              onUpdateComment={onUpdateComment}
               onDeleteComment={onDeleteComment}
             />
           </div>

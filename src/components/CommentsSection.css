@@ -134,18 +134,19 @@
   padding: 16px;
   border-left: 4px solid #667eea;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .comment-item:hover {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.08) 100%);
   transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .comment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
 }
 
 .comment-header-right {
@@ -170,7 +171,7 @@
 }
 
 .comment-date {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: #666;
   font-weight: 500;
 }
