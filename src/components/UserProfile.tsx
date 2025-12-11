@@ -11,7 +11,6 @@ interface UserProfileProps {
 export function UserProfile({ currentUser, onUpdate }: UserProfileProps) {
   const [formData, setFormData] = useState({
     name: currentUser.name,
-    email: currentUser.email || '',
     password: '',
     confirmPassword: '',
     avatar: currentUser.avatar || '👤'
@@ -51,7 +50,6 @@ export function UserProfile({ currentUser, onUpdate }: UserProfileProps) {
     try {
       const updates: Partial<User> = {
         name: formData.name,
-        email: formData.email,
         avatar: formData.avatar
       };
 
@@ -132,16 +130,6 @@ export function UserProfile({ currentUser, onUpdate }: UserProfileProps) {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 

@@ -302,8 +302,7 @@ export const initializeDefaultData = async () => {
         password: 'admin123',
         name: 'Administrador',
         roleId: adminRoleId,
-        avatar: '👤',
-        email: 'admin@incidentalert.com'
+        avatar: '👤'
       });
     }
   } else {
@@ -316,8 +315,7 @@ export const initializeDefaultData = async () => {
         password: 'admin123',
         name: 'Administrador',
         roleId: adminRole?.id || roles[0].id,
-        avatar: '👤',
-        email: 'admin@incidentalert.com'
+        avatar: '👤'
       });
     }
   }

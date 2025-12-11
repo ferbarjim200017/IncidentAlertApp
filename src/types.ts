@@ -9,7 +9,6 @@ export interface User {
   name: string;
   roleId?: string; // Referencia al rol
   avatar?: string;
-  email?: string;
   createdAt?: string;
   preferences?: UserPreferences;
 }

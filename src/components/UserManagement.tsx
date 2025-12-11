@@ -18,7 +18,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     username: '',
     password: '',
     name: '',
-    email: '',
     avatar: '👤',
     roleId: '',
   });
@@ -74,7 +73,7 @@ export function UserManagement({ currentUser }: UserManagementProps) {
   };
 
   const resetForm = () => {
-    setFormData({ username: '', password: '', name: '', email: '', avatar: '👤', roleId: '' });
+    setFormData({ username: '', password: '', name: '', avatar: '👤', roleId: '' });
     setShowCreateForm(false);
     setEditingUser(null);
     setShowPassword(false);
@@ -106,7 +105,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
         username: formData.username,
         password: formData.password,
         name: formData.name,
-        email: formData.email || undefined,
         avatar: formData.avatar,
         roleId: formData.roleId,
         createdAt: new Date().toISOString()
@@ -138,7 +136,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     try {
       const updates: Partial<User> = {
         name: formData.name,
-        email: formData.email || undefined,
         avatar: formData.avatar,
         roleId: formData.roleId,
       };
@@ -165,7 +162,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
       username: user.username,
       password: '', // No prellenar contraseña por seguridad
       name: user.name,
-      email: user.email || '',
       avatar: user.avatar || '👤',
       roleId: user.roleId || '',
     });
@@ -247,17 +243,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
 
             <div className="user-form-row">
               <div className="user-form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="correo@ejemplo.com"
-                />
-              </div>
-
-              <div className="user-form-group">
                 <label htmlFor="roleId">Rol *</label>
                 <select
                   id="roleId"
@@ -273,10 +258,25 @@ export function UserManagement({ currentUser }: UserManagementProps) {
                   ))}
                 </select>
               </div>
+
+              <div className="user-form-group">
+                <label>Avatar</label>
+                <div className="avatar-selector">
+                  {['👤', '👨', '👩', '🧑', '👨‍💼', '👩‍💼', '👨‍💻', '👩‍💻', '🦸', '🦸‍♀️', '🧙', '🧙‍♀️'].map(emoji => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      className={`avatar-option ${formData.avatar === emoji ? 'selected' : ''}`}
+                      onClick={() => setFormData({ ...formData, avatar: emoji })}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="user-form-group">
-              <label>Avatar</label>
               <div className="avatar-selector">
                 {['👤', '👨', '👩', '🧑', '👨‍💼', '👩‍💼', '👨‍💻', '👩‍💻', '🦸', '🦸‍♀️', '🧙', '🧙‍♀️'].map(emoji => (
                   <button
@@ -336,7 +336,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
                 <th>Avatar</th>
                 <th>Usuario</th>
                 <th>Nombre</th>
-                <th>Email</th>
                 <th>Rol</th>
                 <th>Fecha de Creación</th>
                 <th>Acciones</th>
@@ -355,7 +354,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
                     </span>
                   </td>
                   <td>{user.name}</td>
-                  <td>{user.email || <span className="text-muted">Sin email</span>}</td>
                   <td>
                     <span className="role-badge">
                       {userRoles.get(user.id)?.name || <span className="text-muted">Sin rol</span>}
