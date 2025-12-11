@@ -1,0 +1,107 @@
+.quick-incidents-container {
+  background: transparent;
+  padding: 0;
+}
+
+.quick-incidents-container h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2d3748;
+  letter-spacing: -0.3px;
+}
+
+.quick-incidents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.quick-incident-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  background: white;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.quick-incident-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateX(4px);
+}
+
+.quick-incident-name {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.quick-incident-status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.quick-incidents-empty {
+  text-align: center;
+  padding: 20px 10px;
+  color: #689f38;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Scrollbar personalizado */
+.quick-incidents-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quick-incidents-list::-webkit-scrollbar-track {
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 10px;
+}
+
+.quick-incidents-list::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.4);
+  border-radius: 10px;
+}
+
+.quick-incidents-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.6);
+}
+
+@media (max-width: 768px) {
+  .quick-incidents-container {
+    padding: 12px;
+  }
+
+  .quick-incidents-container h3 {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .quick-incident-item {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .quick-incident-status {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+}

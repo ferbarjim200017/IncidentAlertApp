@@ -1,0 +1,554 @@
+.all-incidents-table-container {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 1.5rem;
+  height: calc(100vh - 180px);
+  overflow: hidden;
+}
+
+.search-sidebar {
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.table-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 147, 251, 0.03) 100%);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.table-actions {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, rgba(240, 147, 251, 0.08) 100%);
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.table-wrapper {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.filter-results {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.btn-export-excel {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-export-excel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-new-incident {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-new-incident:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* ============================================
+   TABLA DE INCIDENCIAS - ESTRUCTURA PRINCIPAL
+   ============================================ */
+
+.all-incidents-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.all-incidents-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.all-incidents-table th {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+}
+
+/* Anchos específicos por columna */
+.col-name { width: 20%; }
+.col-status { width: 12%; }
+.col-priority { width: 11%; }
+.col-type { width: 11%; }
+.col-contact { width: 13%; }
+.col-pr { width: 11%; }
+.col-actions { width: 11%; }
+
+.all-incidents-table tbody tr {
+  border-bottom: 1px solid #e8e8e8;
+  transition: background 0.2s ease;
+}
+
+.all-incidents-table td {
+  padding: 0.75rem 0.5rem;
+  vertical-align: middle;
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   HEADERS ORDENABLES
+   ============================================ */
+
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.sortable-header:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.sortable-header:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   FILAS INTERACTIVAS
+   ============================================ */
+
+.incident-row-clickable {
+  cursor: pointer;
+}
+
+.incident-row-clickable:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.08) 100%);
+}
+
+.incident-row-clickable:active {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(240, 147, 251, 0.12) 100%);
+}
+
+/* ============================================
+   CELDAS ESPECÍFICAS
+   ============================================ */
+
+.name-cell {
+  font-weight: 700;
+  color: #333;
+}
+
+.contact-cell {
+  color: #555;
+  font-weight: 500;
+}
+
+.pr-cell {
+  color: #667eea;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+/* ============================================
+   BADGES Y ETIQUETAS
+   ============================================ */
+
+.status-badge {
+  padding: 0.3rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: inline-block;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-abierta {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+}
+
+.status-en-progreso {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color: #e65100;
+}
+
+.status-puesto-en-test {
+  background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%);
+  color: #5e35b1;
+}
+
+.status-verificado-en-test {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  color: #00838f;
+}
+
+.status-resuelta {
+  background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+  color: #558b2f;
+}
+
+.status-cerrada {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  color: #6a1b9a;
+}
+
+.priority-badge {
+  padding: 0.3rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.65rem;
+  display: inline-block;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.priority-crítica {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  color: #b71c1c;
+}
+
+.priority-alta {
+  background: linear-gradient(135deg, #ffe0b2 0%, #ffcc80 100%);
+  color: #e65100;
+}
+
+.priority-media {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  color: #f57f17;
+}
+
+.priority-baja {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+}
+
+.type-badge {
+  padding: 0.3rem 0.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.65rem;
+  display: inline-block;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-correctivo {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  color: #b71c1c;
+}
+
+.type-evolutivo {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+}
+
+.type-tarea {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  color: #6a1b9a;
+}
+
+.row-priority-crítica {
+  border-left: 4px solid #f44336;
+}
+
+.row-priority-alta {
+  border-left: 4px solid #ff9800;
+}
+
+.row-priority-media {
+  border-left: 4px solid #ffc107;
+}
+
+.row-priority-baja {
+  border-left: 4px solid #4caf50;
+}
+
+.btn-table-edit,
+.btn-table-delete {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.btn-table-edit {
+  color: #ff9800;
+}
+
+.btn-table-edit:hover {
+  background: rgba(255, 152, 0, 0.15);
+  transform: scale(1.25);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.btn-table-delete {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+  border: 2px solid rgba(244, 67, 54, 0.3);
+  color: #f44336;
+  padding: 0.4rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.btn-table-delete:hover {
+  background: #f44336;
+  color: white;
+  border-color: #f44336;
+  transform: translateY(-1px) scale(1.1);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.all-incidents-empty {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #999;
+  background: linear-gradient(135deg, #f8f9fa 0%, rgba(240, 147, 251, 0.08) 100%);
+  border-radius: 12px;
+  border: 2px dashed rgba(102, 126, 234, 0.3);
+}
+
+.all-incidents-empty p {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   MODAL DE CONFIRMACIÓN DE ELIMINACIÓN
+   ============================================ */
+
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+.delete-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+}
+
+.delete-modal-header {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.delete-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.delete-modal-body {
+  padding: 2rem;
+  text-align: center;
+}
+
+.delete-modal-body p {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.delete-modal-incident-name {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #333;
+  background: rgba(244, 67, 54, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 2px solid rgba(244, 67, 54, 0.2);
+}
+
+.delete-modal-warning {
+  font-size: 0.9rem;
+  color: #f44336;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.delete-modal-actions {
+  padding: 1.5rem 2rem;
+  background: rgba(0, 0, 0, 0.02);
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-cancel-delete {
+  background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+  color: #333;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel-delete:hover {
+  background: linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%);
+  transform: translateY(-1px);
+}
+
+.btn-confirm-delete {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.btn-confirm-delete:hover {
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1024px) {
+  .all-incidents-table {
+    font-size: 0.8rem;
+  }
+
+  .all-incidents-table th,
+  .all-incidents-table td {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .all-incidents-table-container {
+    overflow-x: auto;
+  }
+
+  .all-incidents-table {
+    min-width: 900px;
+  }
+
+  .actions-cell {
+    flex-direction: column;
+  }
+
+  .table-filters {
+    padding: 1.25rem;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,0 +1,310 @@
+﻿[
+  {
+    "id": "inc-2024-001",
+    "name": "MOV-10245",
+    "title": "Error en módulo de facturación",
+    "description": "El sistema no genera correctamente las facturas mensuales para clientes con descuentos aplicados",
+    "status": "en-progreso",
+    "priority": "alta",
+    "type": "correctivo",
+    "contactUser": "Juan Pérez",
+    "userId": "admin",
+    "assignedTo": "María García",
+    "prQA2": "PR-QA2-2024-045",
+    "prMain": "PR-MAIN-2024-023",
+    "creationDate": "2024-11-15",
+    "createdAt": "2024-11-15T09:00:00.000Z",
+    "updatedAt": "2024-11-17T14:20:00.000Z",
+    "estimatedHours": 8,
+    "tags": ["facturación", "urgente", "backend"],
+    "comments": [
+      {
+        "id": "comment-001",
+        "text": "Detectado el problema en el cálculo de descuentos",
+        "author": "María García",
+        "date": "2024-11-16T10:30:00.000Z"
+      },
+      {
+        "id": "comment-002",
+        "text": "Aplicando corrección en el servicio de facturación",
+        "author": "María García",
+        "date": "2024-11-17T14:20:00.000Z"
+      }
+    ],
+    "timeEntries": [
+      {
+        "id": "time-001",
+        "hours": 3,
+        "description": "Análisis del problema",
+        "date": "2024-11-16"
+      },
+      {
+        "id": "time-002",
+        "hours": 4,
+        "description": "Desarrollo de la solución",
+        "date": "2024-11-17"
+      }
+    ],
+    "prQA2List": [
+      {
+        "id": "pr-qa2-001",
+        "number": "PR-QA2-2024-045",
+        "title": "Fix: Corrección cálculo descuentos facturación",
+        "link": "https://github.com/empresa/proyecto/pull/145"
+      }
+    ],
+    "prMainList": [
+      {
+        "id": "pr-main-001",
+        "number": "PR-MAIN-2024-023",
+        "title": "Fix: Corrección cálculo descuentos facturación",
+        "link": "https://github.com/empresa/proyecto/pull/123"
+      }
+    ]
+  },
+  {
+    "id": "inc-2024-002",
+    "name": "MOV-10378",
+    "title": "Mejora interfaz de usuario en dashboard",
+    "description": "Actualizar el diseño del dashboard principal para mejorar la experiencia de usuario según feedback recibido",
+    "status": "abierta",
+    "priority": "media",
+    "type": "evolutivo",
+    "contactUser": "Laura Martínez",
+    "userId": "admin",
+    "assignedTo": "Carlos Rodríguez",
+    "prQA2": "",
+    "prMain": "",
+    "creationDate": "2024-11-18",
+    "createdAt": "2024-11-18T11:30:00.000Z",
+    "updatedAt": "2024-11-18T11:30:00.000Z",
+    "estimatedHours": 12,
+    "tags": ["ui", "dashboard", "frontend"],
+    "comments": [],
+    "timeEntries": [],
+    "prQA2List": [],
+    "prMainList": []
+  },
+  {
+    "id": "inc-2024-003",
+    "name": "MOV-10412",
+    "title": "Consulta integración API de pagos",
+    "description": "Cliente solicita información sobre cómo integrar el sistema de pagos con su plataforma externa",
+    "status": "resuelta",
+    "priority": "baja",
+    "type": "consultivo",
+    "contactUser": "Pedro Sánchez",
+    "userId": "admin",
+    "assignedTo": "Ana López",
+    "prQA2": "",
+    "prMain": "",
+    "creationDate": "2024-11-10",
+    "createdAt": "2024-11-10T08:00:00.000Z",
+    "updatedAt": "2024-11-12T16:45:00.000Z",
+    "estimatedHours": 2,
+    "tags": ["consulta", "api", "pagos"],
+    "comments": [
+      {
+        "id": "comment-003",
+        "text": "Documentación enviada al cliente",
+        "author": "Ana López",
+        "date": "2024-11-12T16:45:00.000Z"
+      }
+    ],
+    "timeEntries": [
+      {
+        "id": "time-003",
+        "hours": 2,
+        "description": "Preparación de documentación técnica",
+        "date": "2024-11-12"
+      }
+    ],
+    "prQA2List": [],
+    "prMainList": []
+  },
+  {
+    "id": "inc-2024-004",
+    "name": "MOV-10589",
+    "title": "Bug en proceso de autenticación",
+    "description": "Algunos usuarios no pueden iniciar sesión cuando usan caracteres especiales en la contraseña",
+    "status": "en-progreso",
+    "priority": "crítica",
+    "type": "correctivo",
+    "contactUser": "Sistema Automático",
+    "userId": "admin",
+    "assignedTo": "María García",
+    "prQA2": "PR-QA2-2024-067",
+    "prMain": "",
+    "creationDate": "2024-11-20",
+    "createdAt": "2024-11-20T15:20:00.000Z",
+    "updatedAt": "2024-11-21T10:15:00.000Z",
+    "estimatedHours": 4,
+    "tags": ["seguridad", "login", "urgente"],
+    "comments": [
+      {
+        "id": "comment-004",
+        "text": "Identificado problema en validación de caracteres especiales",
+        "author": "María García",
+        "date": "2024-11-21T10:15:00.000Z"
+      }
+    ],
+    "timeEntries": [
+      {
+        "id": "time-004",
+        "hours": 2,
+        "description": "Investigación y debugging",
+        "date": "2024-11-21"
+      }
+    ],
+    "prQA2List": [
+      {
+        "id": "pr-qa2-002",
+        "number": "PR-QA2-2024-067",
+        "title": "Fix: Validación caracteres especiales en login",
+        "link": "https://github.com/empresa/proyecto/pull/167"
+      }
+    ],
+    "prMainList": []
+  },
+  {
+    "id": "inc-2024-005",
+    "name": "MOV-10623",
+    "title": "Implementar exportación a Excel",
+    "description": "Añadir funcionalidad para exportar reportes de incidencias a formato Excel con filtros personalizados",
+    "status": "abierta",
+    "priority": "media",
+    "type": "evolutivo",
+    "contactUser": "Roberto Díaz",
+    "userId": "admin",
+    "assignedTo": "Carlos Rodríguez",
+    "prQA2": "",
+    "prMain": "",
+    "creationDate": "2024-11-22",
+    "createdAt": "2024-11-22T09:45:00.000Z",
+    "updatedAt": "2024-11-22T09:45:00.000Z",
+    "estimatedHours": 16,
+    "tags": ["exportación", "excel", "reportes"],
+    "comments": [],
+    "timeEntries": [],
+    "prQA2List": [],
+    "prMainList": []
+  },
+  {
+    "id": "inc-2024-006",
+    "name": "MOV-10734",
+    "title": "Error al cargar imágenes grandes",
+    "description": "El sistema falla al intentar cargar imágenes superiores a 5MB en los comentarios",
+    "status": "resuelta",
+    "priority": "media",
+    "type": "correctivo",
+    "contactUser": "Elena Torres",
+    "userId": "admin",
+    "assignedTo": "Ana López",
+    "prQA2": "PR-QA2-2024-071",
+    "prMain": "PR-MAIN-2024-034",
+    "creationDate": "2024-11-08",
+    "createdAt": "2024-11-08T13:00:00.000Z",
+    "updatedAt": "2024-11-14T17:30:00.000Z",
+    "estimatedHours": 6,
+    "tags": ["imágenes", "upload", "backend"],
+    "comments": [
+      {
+        "id": "comment-005",
+        "text": "Aumentado límite de tamaño y optimización de carga",
+        "author": "Ana López",
+        "date": "2024-11-14T17:30:00.000Z"
+      }
+    ],
+    "timeEntries": [
+      {
+        "id": "time-005",
+        "hours": 6,
+        "description": "Implementación de compresión y optimización",
+        "date": "2024-11-14"
+      }
+    ],
+    "prQA2List": [
+      {
+        "id": "pr-qa2-003",
+        "number": "PR-QA2-2024-071",
+        "title": "Fix: Optimización carga imágenes grandes",
+        "link": "https://github.com/empresa/proyecto/pull/171"
+      }
+    ],
+    "prMainList": [
+      {
+        "id": "pr-main-002",
+        "number": "PR-MAIN-2024-034",
+        "title": "Fix: Optimización carga imágenes grandes",
+        "link": "https://github.com/empresa/proyecto/pull/134"
+      }
+    ]
+  },
+  {
+    "id": "inc-2024-007",
+    "name": "MOV-10891",
+    "title": "Optimización consultas base de datos",
+    "description": "Las consultas de reportes están tardando demasiado tiempo. Necesita optimización de índices",
+    "status": "en-progreso",
+    "priority": "alta",
+    "type": "evolutivo",
+    "contactUser": "Admin Sistema",
+    "userId": "admin",
+    "assignedTo": "María García",
+    "prQA2": "PR-QA2-2024-078",
+    "prMain": "",
+    "creationDate": "2024-11-23",
+    "createdAt": "2024-11-23T10:00:00.000Z",
+    "updatedAt": "2024-11-24T14:20:00.000Z",
+    "estimatedHours": 10,
+    "tags": ["base-datos", "performance", "optimización"],
+    "comments": [
+      {
+        "id": "comment-006",
+        "text": "Analizando queries más lentas",
+        "author": "María García",
+        "date": "2024-11-24T14:20:00.000Z"
+      }
+    ],
+    "timeEntries": [
+      {
+        "id": "time-006",
+        "hours": 4,
+        "description": "Análisis de performance",
+        "date": "2024-11-24"
+      }
+    ],
+    "prQA2List": [
+      {
+        "id": "pr-qa2-004",
+        "number": "PR-QA2-2024-078",
+        "title": "Perf: Optimización índices BD",
+        "link": "https://github.com/empresa/proyecto/pull/178"
+      }
+    ],
+    "prMainList": []
+  },
+  {
+    "id": "inc-2024-008",
+    "name": "MOV-10967",
+    "title": "Consulta sobre roles y permisos",
+    "description": "Cliente necesita entender cómo configurar roles personalizados para diferentes departamentos",
+    "status": "abierta",
+    "priority": "baja",
+    "type": "consultivo",
+    "contactUser": "Carmen Ruiz",
+    "userId": "admin",
+    "assignedTo": "Carlos Rodríguez",
+    "prQA2": "",
+    "prMain": "",
+    "creationDate": "2024-11-25",
+    "createdAt": "2024-11-25T08:30:00.000Z",
+    "updatedAt": "2024-11-25T08:30:00.000Z",
+    "estimatedHours": 3,
+    "tags": ["consulta", "permisos", "usuarios"],
+    "comments": [],
+    "timeEntries": [],
+    "prQA2List": [],
+    "prMainList": []
+  }
+]

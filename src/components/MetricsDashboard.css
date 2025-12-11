@@ -1,0 +1,150 @@
+.metrics-dashboard {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+
+.metrics-title {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.35rem;
+  color: #2d3748;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border-left: 3px solid;
+}
+
+.metric-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.metric-primary {
+  border-left-color: #667eea;
+}
+
+.metric-success {
+  border-left-color: #10b981;
+}
+
+.metric-info {
+  border-left-color: #06b6d4;
+}
+
+.metric-warning {
+  border-left-color: #f59e0b;
+}
+
+.metric-icon {
+  font-size: 2.5rem;
+  opacity: 0.9;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.metrics-detail {
+  background: transparent;
+  padding: 1.5rem 0 0;
+}
+
+.metrics-detail h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.type-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.type-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.05) 100%);
+  border-radius: 8px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.type-stat-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.type-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .metric-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .metric-icon {
+    font-size: 2rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .metric-label {
+    font-size: 0.75rem;
+  }
+
+  .type-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .type-stat-item {
+    min-width: auto;
+  }
+}

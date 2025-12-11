@@ -1,0 +1,24 @@
+.yearly-chart-container {
+  background: transparent;
+  padding: 2rem 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.yearly-chart-container h3 {
+  color: #2d3748;
+  font-size: 1.35rem;
+  margin: 0 0 1.5rem 0;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+@media (max-width: 768px) {
+  .yearly-chart-container {
+    padding: 1rem;
+  }
+
+  .yearly-chart-container h3 {
+    font-size: 1.1rem;
+  }
+}

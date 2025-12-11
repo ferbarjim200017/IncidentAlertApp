@@ -1,0 +1,25 @@
+.incident-stats-container {
+  background: transparent;
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.stats-chart {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .incident-stats-container {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .incident-stats-container {
+    padding: 12px;
+  }
+}

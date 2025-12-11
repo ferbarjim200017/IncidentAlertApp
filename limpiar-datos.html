@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Datos - Sistema de Incidencias</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            color: #856404;
+        }
+
+        .warning h2 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #0c5460;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            color: #0c5460;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            color: #155724;
+            display: none;
+        }
+
+        .success.show {
+            display: block;
+        }
+
+        ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff0844 0%, #ff6b6b 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 8, 68, 0.4);
+        }
+
+        .btn-selective {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-selective:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .storage-info {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .storage-info h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .storage-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .storage-item:last-child {
+            border-bottom: none;
+        }
+
+        .count {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        #backButton {
+            display: none;
+            width: 100%;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        #backButton.show {
+            display: block;
+        }
+
+        #backButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Limpiar Datos del Sistema</h1>
+        
+        <div class="warning">
+            <h2>⚠️ Advertencia</h2>
+            <p>Esta herramienta te permite eliminar datos del sistema de incidencias.</p>
+        </div>
+
+        <div class="info">
+            <h3>📊 Datos actuales en el sistema:</h3>
+            <div id="storageInfo" class="storage-info">
+                <div class="storage-item">
+                    <span>Incidencias:</span>
+                    <span class="count" id="incidentsCount">-</span>
+                </div>
+                <div class="storage-item">
+                    <span>Comentarios:</span>
+                    <span class="count" id="commentsCount">-</span>
+                </div>
+                <div class="storage-item">
+                    <span>Usuarios:</span>
+                    <span class="count" id="usersCount">-</span>
+                </div>
+                <div class="storage-item">
+                    <span>Reglas de automatización:</span>
+                    <span class="count" id="rulesCount">-</span>
+                </div>
+                <div class="storage-item">
+                    <span>Etiquetas del sistema:</span>
+                    <span class="count" id="tagsCount">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="success" id="successMessage">
+            <h2>✅ Operación completada</h2>
+            <p id="successText"></p>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-selective" onclick="clearIncidentsOnly()">
+                🗂️ Solo Incidencias
+            </button>
+            <button class="btn-danger" onclick="clearAllData()">
+                💣 Borrar Todo
+            </button>
+        </div>
+
+        <button id="backButton" onclick="goBack()">
+            ← Volver a la Aplicación
+        </button>
+    </div>
+
+    <script>
+        // Cargar información del storage
+        function loadStorageInfo() {
+            try {
+                const incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+                const comments = JSON.parse(localStorage.getItem('incident_comments') || '{}');
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const rules = JSON.parse(localStorage.getItem('automation_rules') || '[]');
+                const tags = JSON.parse(localStorage.getItem('system_tags') || '[]');
+
+                document.getElementById('incidentsCount').textContent = incidents.length;
+                document.getElementById('commentsCount').textContent = Object.keys(comments).length;
+                document.getElementById('usersCount').textContent = users.length;
+                document.getElementById('rulesCount').textContent = rules.length;
+                document.getElementById('tagsCount').textContent = tags.length;
+            } catch (error) {
+                console.error('Error loading storage info:', error);
+                document.getElementById('incidentsCount').textContent = 'Error';
+                document.getElementById('commentsCount').textContent = 'Error';
+                document.getElementById('usersCount').textContent = 'Error';
+                document.getElementById('rulesCount').textContent = 'Error';
+                document.getElementById('tagsCount').textContent = 'Error';
+            }
+        }
+
+        // Borrar solo incidencias y comentarios
+        function clearIncidentsOnly() {
+            if (confirm('¿Estás seguro de que quieres eliminar TODAS las incidencias y sus comentarios?\n\nEsta acción no se puede deshacer.')) {
+                try {
+                    localStorage.removeItem('incidents');
+                    localStorage.removeItem('incident_comments');
+                    
+                    // Mostrar mensaje de éxito
+                    document.getElementById('successText').textContent = 
+                        'Se han eliminado todas las incidencias y comentarios. Los usuarios, configuraciones y reglas de automatización se mantienen intactos.';
+                    document.getElementById('successMessage').classList.add('show');
+                    document.getElementById('backButton').classList.add('show');
+                    
+                    // Actualizar contador
+                    loadStorageInfo();
+                } catch (error) {
+                    alert('Error al eliminar los datos: ' + error.message);
+                }
+            }
+        }
+
+        // Borrar todos los datos
+        function clearAllData() {
+            if (confirm('⚠️ ¿ELIMINAR TODOS LOS DATOS?\n\nEsto incluye:\n- Incidencias\n- Comentarios\n- Usuarios\n- Reglas de automatización\n- Etiquetas\n- Configuraciones\n\nEsta acción NO se puede deshacer.')) {
+                if (confirm('¿Estás COMPLETAMENTE seguro?\n\nSe perderá toda la información del sistema.')) {
+                    try {
+                        localStorage.clear();
+                        
+                        // Mostrar mensaje de éxito
+                        document.getElementById('successText').textContent = 
+                            'Se han eliminado TODOS los datos del sistema. La aplicación está completamente limpia.';
+                        document.getElementById('successMessage').classList.add('show');
+                        document.getElementById('backButton').classList.add('show');
+                        
+                        // Actualizar contador
+                        loadStorageInfo();
+                    } catch (error) {
+                        alert('Error al eliminar los datos: ' + error.message);
+                    }
+                }
+            }
+        }
+
+        // Volver a la aplicación
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Cargar info al cargar la página
+        window.addEventListener('load', loadStorageInfo);
+    </script>
+</body>
+</html>

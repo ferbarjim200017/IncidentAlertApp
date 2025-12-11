@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output (excluimos dist porque lo necesitamos para GitHub Pages)
+# dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Electron build
+release/
+
+# Temp files
+*.tmp
+*.swp
