@@ -13,7 +13,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { db } from './firebaseConfig';
-import { Incident, User, Comment, TimeEntry, AutomationRule, Tag } from './types';
+import { Incident, User, Comment, TimeEntry, AutomationRule, Tag, Role } from './types';
 
 // ============ INCIDENTS ============
 export const getIncidents = async (): Promise<Incident[]> => {
@@ -212,20 +212,113 @@ export const subscribeToUsers = (callback: (users: User[]) => void) => {
   });
 };
 
+// ============ ROLES ============
+export const getRoles = async (): Promise<Role[]> => {
+  const querySnapshot = await getDocs(collection(db, 'roles'));
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Role));
+};
+
+export const getRoleById = async (id: string): Promise<Role | null> => {
+  const docRef = doc(db, 'roles', id);
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? { ...docSnap.data(), id: docSnap.id } as Role : null;
+};
+
+export const addRole = async (role: Omit<Role, 'id'>): Promise<string> => {
+  const docRef = await addDoc(collection(db, 'roles'), {
+    ...role,
+    createdAt: role.createdAt || new Date().toISOString()
+  });
+  return docRef.id;
+};
+
+export const updateRole = async (id: string, role: Partial<Role>): Promise<void> => {
+  const docRef = doc(db, 'roles', id);
+  await updateDoc(docRef, { ...role });
+};
+
+export const deleteRole = async (id: string): Promise<void> => {
+  await deleteDoc(doc(db, 'roles', id));
+};
+
+export const subscribeToRoles = (callback: (roles: Role[]) => void) => {
+  return onSnapshot(collection(db, 'roles'), (snapshot) => {
+    const roles = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Role));
+    callback(roles);
+  });
+};
+
 // ============ INITIALIZE DEFAULT DATA ============
 export const initializeDefaultData = async () => {
-  // Verificar si ya hay usuarios
-  const users = await getUsers();
-  if (users.length === 0) {
-    // Crear usuario admin por defecto
-    await addUser({
-      username: 'admin',
-      password: 'admin123',
+  // Inicializar roles por defecto
+  const roles = await getRoles();
+  if (roles.length === 0) {
+    // Crear rol de Administrador
+    const adminRoleId = await addRole({
       name: 'Administrador',
-      role: 'admin',
-      avatar: '👤',
-      email: 'admin@incidentalert.com'
+      isSystem: true,
+      permissions: {
+        incidents: { create: true, read: true, update: true, delete: true, viewAll: true },
+        users: { viewOwn: true, editOwn: true, viewAll: true, create: true, edit: true, delete: true },
+        roles: { view: true, create: true, edit: true, delete: true },
+        settings: { view: true, edit: true },
+        automation: { view: true, create: true, edit: true, delete: true }
+      }
     });
+
+    // Crear rol de Usuario estándar
+    await addRole({
+      name: 'Usuario',
+      isSystem: true,
+      permissions: {
+        incidents: { create: true, read: true, update: true, delete: false, viewAll: false },
+        users: { viewOwn: true, editOwn: true, viewAll: false, create: false, edit: false, delete: false },
+        roles: { view: false, create: false, edit: false, delete: false },
+        settings: { view: true, edit: false },
+        automation: { view: false, create: false, edit: false, delete: false }
+      }
+    });
+
+    // Crear rol de Solo lectura
+    await addRole({
+      name: 'Solo Lectura',
+      isSystem: true,
+      permissions: {
+        incidents: { create: false, read: true, update: false, delete: false, viewAll: false },
+        users: { viewOwn: true, editOwn: false, viewAll: false, create: false, edit: false, delete: false },
+        roles: { view: false, create: false, edit: false, delete: false },
+        settings: { view: false, edit: false },
+        automation: { view: false, create: false, edit: false, delete: false }
+      }
+    });
+
+    // Verificar si ya hay usuarios
+    const users = await getUsers();
+    if (users.length === 0) {
+      // Crear usuario admin por defecto con rol de administrador
+      await addUser({
+        username: 'admin',
+        password: 'admin123',
+        name: 'Administrador',
+        roleId: adminRoleId,
+        avatar: '👤',
+        email: 'admin@incidentalert.com'
+      });
+    }
+  } else {
+    // Si ya hay roles pero no hay usuarios
+    const users = await getUsers();
+    if (users.length === 0) {
+      const adminRole = roles.find(r => r.name === 'Administrador');
+      await addUser({
+        username: 'admin',
+        password: 'admin123',
+        name: 'Administrador',
+        roleId: adminRole?.id || roles[0].id,
+        avatar: '👤',
+        email: 'admin@incidentalert.com'
+      });
+    }
   }
 
   // Inicializar configuración por defecto

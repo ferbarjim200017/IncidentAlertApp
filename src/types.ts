@@ -7,7 +7,7 @@ export interface User {
   username: string;
   password: string;
   name: string;
-  role?: string;
+  roleId?: string; // Referencia al rol
   avatar?: string;
   email?: string;
   createdAt?: string;
@@ -18,6 +18,48 @@ export interface UserPreferences {
   theme?: string;
   notifications?: boolean;
   language?: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  permissions: RolePermissions;
+  isSystem?: boolean; // Los roles de sistema no se pueden eliminar
+  createdAt?: string;
+}
+
+export interface RolePermissions {
+  incidents: {
+    create: boolean;
+    read: boolean;
+    update: boolean;
+    delete: boolean;
+    viewAll: boolean; // Ver incidencias de otros usuarios
+  };
+  users: {
+    viewOwn: boolean; // Ver su propio perfil
+    editOwn: boolean; // Editar su propio perfil
+    viewAll: boolean; // Ver todos los usuarios (admin)
+    create: boolean; // Crear usuarios
+    edit: boolean; // Editar otros usuarios
+    delete: boolean; // Eliminar usuarios
+  };
+  roles: {
+    view: boolean;
+    create: boolean;
+    edit: boolean;
+    delete: boolean;
+  };
+  settings: {
+    view: boolean;
+    edit: boolean;
+  };
+  automation: {
+    view: boolean;
+    create: boolean;
+    edit: boolean;
+    delete: boolean;
+  };
 }
 
 export interface Comment {

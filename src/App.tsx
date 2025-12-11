@@ -21,17 +21,20 @@ import { UserManagement } from './components/UserManagement';
 import { AppearanceSettings } from './components/AppearanceSettings';
 import { GeneralSettings } from './components/GeneralSettings';
 import { Login } from './components/Login';
+import { UserProfile } from './components/UserProfile';
+import RoleManagement from './components/RoleManagement';
 import { themes } from './components/AppearanceSettings';
 import './App.css';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<any | null>(null);
   const [allIncidents, setAllIncidents] = useState<Incident[]>([]);
   const [automationRules, setAutomationRules] = useState<AutomationRule[]>([]);
   const [editingIncident, setEditingIncident] = useState<Incident | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'all-incidents' | 'new-incident' | 'incident-detail' | 'settings'>('dashboard');
-  const [settingsSection, setSettingsSection] = useState<'automation' | 'users' | 'appearance' | 'general'>('automation');
+  const [settingsSection, setSettingsSection] = useState<'profile' | 'automation' | 'users' | 'roles' | 'appearance' | 'general'>('profile');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [currentTheme, setCurrentTheme] = useState<string>('purple-gradient');
   const [openIncidents, setOpenIncidents] = useState<Incident[]>([]);
@@ -115,12 +118,21 @@ function App() {
       setAllIncidents(incidents);
       
       // Actualizar incidente seleccionado si está abierto
-      if (selectedIncident) {
-        const updated = incidents.find(inc => inc.id === selectedIncident.id);
-        if (updated) {
-          setSelectedIncident(updated);
+      setSelectedIncident(prev => {
+        if (prev) {
+          const updated = incidents.find(inc => inc.id === prev.id);
+          return updated || prev;
         }
-      }
+        return prev;
+      });
+      
+      // Actualizar incidentes abiertos en tabs
+      setOpenIncidents(prev => 
+        prev.map(openInc => {
+          const updated = incidents.find(inc => inc.id === openInc.id);
+          return updated || openInc;
+        })
+      );
     });
     
     return () => {
@@ -128,6 +140,24 @@ function App() {
       unsubscribe();
     };
   }, []);
+
+  // Cargar rol del usuario cuando cambie el currentUser
+  useEffect(() => {
+    const loadUserRole = async () => {
+      if (currentUser?.roleId) {
+        try {
+          const role = await firebaseService.getRoleById(currentUser.roleId);
+          setUserRole(role);
+        } catch (error) {
+          console.error('Error loading user role:', error);
+        }
+      } else {
+        setUserRole(null);
+      }
+    };
+    
+    loadUserRole();
+  }, [currentUser]);
 
   useEffect(() => {
     if (notification) {
@@ -583,19 +613,35 @@ function App() {
               <h2>⚙️ Ajustes</h2>
               <div className="settings-menu">
                 <button
+                  className={`settings-menu-item ${settingsSection === 'profile' ? 'active' : ''}`}
+                  onClick={() => setSettingsSection('profile')}
+                >
+                  <span className="menu-icon">👤</span>
+                  <span>Mi Perfil</span>
+                </button>
+                <button
                   className={`settings-menu-item ${settingsSection === 'automation' ? 'active' : ''}`}
                   onClick={() => setSettingsSection('automation')}
                 >
                   <span className="menu-icon">🤖</span>
                   <span>Automatización</span>
                 </button>
-                {currentUser && currentUser.username === 'admin' && (
+                {userRole?.permissions.users.viewAll && (
                   <button
                     className={`settings-menu-item ${settingsSection === 'users' ? 'active' : ''}`}
                     onClick={() => setSettingsSection('users')}
                   >
                     <span className="menu-icon">👥</span>
                     <span>Usuarios</span>
+                  </button>
+                )}
+                {userRole?.permissions.roles.view && (
+                  <button
+                    className={`settings-menu-item ${settingsSection === 'roles' ? 'active' : ''}`}
+                    onClick={() => setSettingsSection('roles')}
+                  >
+                    <span className="menu-icon">🔐</span>
+                    <span>Roles</span>
                   </button>
                 )}
                 <button
@@ -615,15 +661,29 @@ function App() {
               </div>
             </div>
             <div className="settings-content">
-              {settingsSection === 'automation' ? (
+              {settingsSection === 'profile' ? (
+                <UserProfile 
+                  currentUser={currentUser!} 
+                  onUpdate={async () => {
+                    // Recargar usuario desde Firebase
+                    const users = await firebaseService.getUsers();
+                    const updatedUser = users.find(u => u.id === currentUser!.id);
+                    if (updatedUser) {
+                      setCurrentUser(updatedUser);
+                    }
+                  }}
+                />
+              ) : settingsSection === 'automation' ? (
                 <AutomationRules
                   rules={automationRules}
                   onAddRule={handleAddAutomationRule}
                   onUpdateRule={handleUpdateAutomationRule}
                   onDeleteRule={handleDeleteAutomationRule}
                 />
-              ) : settingsSection === 'users' && currentUser && currentUser.username === 'admin' ? (
+              ) : settingsSection === 'users' && userRole?.permissions.users.viewAll ? (
                 <UserManagement currentUser={currentUser} />
+              ) : settingsSection === 'roles' && userRole?.permissions.roles.view ? (
+                <RoleManagement currentUser={currentUser} />
               ) : settingsSection === 'appearance' ? (
                 <AppearanceSettings 
                   currentTheme={currentTheme}
