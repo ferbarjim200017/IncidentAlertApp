@@ -251,10 +251,12 @@ export const subscribeToRoles = (callback: (roles: Role[]) => void) => {
 
 // ============ INITIALIZE DEFAULT DATA ============
 export const initializeDefaultData = async () => {
-  // Inicializar roles por defecto
+  // Verificar si existe el rol de Administrador
   const roles = await getRoles();
-  if (roles.length === 0) {
-    // Crear rol de Administrador
+  let adminRole = roles.find(r => r.name === 'Administrador');
+  
+  if (!adminRole) {
+    // Crear solo el rol de Administrador
     const adminRoleId = await addRole({
       name: 'Administrador',
       isSystem: true,
@@ -266,58 +268,31 @@ export const initializeDefaultData = async () => {
         automation: { view: true, create: true, edit: true, delete: true }
       }
     });
+    
+    // Recargar roles para obtener el rol recién creado
+    const updatedRoles = await getRoles();
+    adminRole = updatedRoles.find(r => r.id === adminRoleId);
+  }
 
-    // Crear rol de Usuario estándar
-    await addRole({
-      name: 'Usuario',
-      isSystem: true,
-      permissions: {
-        incidents: { create: true, read: true, update: true, delete: false, viewAll: false },
-        users: { viewOwn: true, editOwn: true, viewAll: false, create: false, edit: false, delete: false },
-        roles: { view: false, create: false, edit: false, delete: false },
-        settings: { view: true, edit: false },
-        automation: { view: false, create: false, edit: false, delete: false }
-      }
+  // Verificar si existe el usuario admin
+  const users = await getUsers();
+  const adminUser = users.find(u => u.username === 'admin');
+  
+  if (!adminUser) {
+    // Crear usuario admin por defecto con rol de administrador
+    await addUser({
+      username: 'admin',
+      password: 'admin123',
+      name: 'Administrador',
+      roleId: adminRole!.id,
+      avatar: '👤'
     });
-
-    // Crear rol de Solo lectura
-    await addRole({
-      name: 'Solo Lectura',
-      isSystem: true,
-      permissions: {
-        incidents: { create: false, read: true, update: false, delete: false, viewAll: false },
-        users: { viewOwn: true, editOwn: false, viewAll: false, create: false, edit: false, delete: false },
-        roles: { view: false, create: false, edit: false, delete: false },
-        settings: { view: false, edit: false },
-        automation: { view: false, create: false, edit: false, delete: false }
-      }
+  } else if (adminUser && (!adminUser.roleId || adminUser.roleId !== adminRole!.id)) {
+    // Actualizar usuario admin existente con el rol correcto
+    await updateUser(adminUser.id, {
+      roleId: adminRole!.id
     });
-
-    // Verificar si ya hay usuarios
-    const users = await getUsers();
-    if (users.length === 0) {
-      // Crear usuario admin por defecto con rol de administrador
-      await addUser({
-        username: 'admin',
-        password: 'admin123',
-        name: 'Administrador',
-        roleId: adminRoleId,
-        avatar: '👤'
-      });
-    }
-  } else {
-    // Si ya hay roles pero no hay usuarios
-    const users = await getUsers();
-    if (users.length === 0) {
-      const adminRole = roles.find(r => r.name === 'Administrador');
-      await addUser({
-        username: 'admin',
-        password: 'admin123',
-        name: 'Administrador',
-        roleId: adminRole?.id || roles[0].id,
-        avatar: '👤'
-      });
-    }
+    console.log('✅ Usuario admin actualizado con rol de Administrador');
   }
 
   // Inicializar configuración por defecto
