@@ -10,7 +10,8 @@ import {
   where,
   Timestamp,
   setDoc,
-  onSnapshot
+  onSnapshot,
+  deleteField
 } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import { Incident, User, Comment, TimeEntry, AutomationRule, Tag, Role } from './types';
@@ -330,5 +331,77 @@ export const initializeDefaultData = async () => {
       autoAssign: false,
       language: 'es'
     });
+  }
+
+  // Migrar usuarios antiguos que tienen 'role' string a 'roleId'
+  await migrateUsersToRoleId();
+};
+
+// Función para migrar usuarios del campo 'role' antiguo al nuevo 'roleId'
+export const migrateUsersToRoleId = async () => {
+  try {
+    const usersRef = collection(db, 'users');
+    const snapshot = await getDocs(usersRef);
+    const roles = await getRoles();
+    
+    // Mapear nombres de roles antiguos a IDs de roles nuevos
+    const adminRole = roles.find(r => r.name === 'Administrador');
+    const userRole = roles.find(r => r.name === 'Usuario');
+    
+    if (!adminRole || !userRole) {
+      console.log('❌ Roles no encontrados para migración');
+      return;
+    }
+
+    const updates: Promise<void>[] = [];
+    let migratedCount = 0;
+    
+    snapshot.forEach((docSnapshot) => {
+      const userData = docSnapshot.data();
+      
+      // Si el usuario tiene el campo 'role' antiguo pero no 'roleId'
+      if (userData.role && !userData.roleId) {
+        migratedCount++;
+        console.log(`🔄 Migrando usuario "${userData.username}" de role: "${userData.role}" a roleId`);
+        
+        let newRoleId = userRole.id; // Por defecto rol de usuario
+        
+        // Mapear roles antiguos
+        if (userData.role === 'admin' || userData.username === 'admin') {
+          newRoleId = adminRole.id;
+          console.log(`   ➜ Asignando rol "Administrador" (${newRoleId})`);
+        } else {
+          console.log(`   ➜ Asignando rol "Usuario" (${newRoleId})`);
+        }
+        
+        // Actualizar el documento sin el campo 'role' antiguo
+        const userDocRef = doc(db, 'users', docSnapshot.id);
+        updates.push(
+          updateDoc(userDocRef, {
+            roleId: newRoleId,
+            role: deleteField() // Eliminar campo antiguo
+          })
+        );
+      } else if (!userData.roleId && !userData.role) {
+        // Usuario sin ningún rol, asignar rol de Usuario por defecto
+        migratedCount++;
+        console.log(`🔄 Usuario "${userData.username}" sin rol, asignando rol "Usuario"`);
+        const userDocRef = doc(db, 'users', docSnapshot.id);
+        updates.push(
+          updateDoc(userDocRef, {
+            roleId: userRole.id
+          })
+        );
+      }
+    });
+
+    if (updates.length > 0) {
+      await Promise.all(updates);
+      console.log(`✅ Migración completada: ${migratedCount} usuarios actualizados al nuevo sistema de roles`);
+    } else {
+      console.log('✅ Todos los usuarios ya tienen roleId asignado');
+    }
+  } catch (error) {
+    console.error('❌ Error en migración de usuarios:', error);
   }
 };
