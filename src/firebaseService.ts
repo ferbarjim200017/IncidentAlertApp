@@ -72,6 +72,17 @@ export const deleteUser = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, 'users', id));
 };
 
+export const updateUserPreferences = async (userId: string, preferences: any): Promise<void> => {
+  const docRef = doc(db, 'users', userId);
+  await updateDoc(docRef, { preferences });
+};
+
+export const getUserPreferences = async (userId: string): Promise<any> => {
+  const user = await getUsers();
+  const foundUser = user.find(u => u.id === userId);
+  return foundUser?.preferences || {};
+};
+
 // ============ COMMENTS ============
 export const getCommentsByIncident = async (incidentId: string): Promise<Comment[]> => {
   const incident = await getIncidentById(incidentId);

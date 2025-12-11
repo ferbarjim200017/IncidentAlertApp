@@ -33,9 +33,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'all-incidents' | 'new-incident' | 'incident-detail' | 'settings'>('dashboard');
   const [settingsSection, setSettingsSection] = useState<'automation' | 'users' | 'appearance' | 'general'>('automation');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
-  const [currentTheme, setCurrentTheme] = useState<string>(() => {
-    return localStorage.getItem('app_theme') || 'purple-gradient';
-  });
+  const [currentTheme, setCurrentTheme] = useState<string>('purple-gradient');
   const [openIncidents, setOpenIncidents] = useState<Incident[]>([]);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string; incidentId?: string } | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -80,6 +78,14 @@ function App() {
         // Verificar si hay usuario autenticado
         const user = authUtils.getCurrentUser();
         setCurrentUser(user);
+        
+        // Cargar tema del usuario desde Firebase
+        if (user) {
+          const preferences = await firebaseService.getUserPreferences(user.id);
+          if (preferences.theme) {
+            setCurrentTheme(preferences.theme);
+          }
+        }
         
         // Cargar reglas de automatización
         const loadedRules = await firebaseService.getAutomationRules();
@@ -248,100 +254,154 @@ function App() {
     }
   };
 
-  const handleAddTag = (incidentId: string, tag: string) => {
-    const updated = storageUtils.addTag(incidentId, tag);
-    setAllIncidents(updated);
-    
-    if (selectedIncident && selectedIncident.id === incidentId) {
-      const updatedIncident = updated.find(inc => inc.id === incidentId);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
+  const handleAddTag = async (incidentId: string, tag: string) => {
+    try {
+      const incident = await firebaseService.getIncidentById(incidentId);
+      if (!incident) return;
+      
+      const currentTags = incident.tags || [];
+      if (!currentTags.includes(tag)) {
+        await firebaseService.updateIncident(incidentId, { 
+          tags: [...currentTags, tag] 
+        });
       }
+    } catch (error) {
+      console.error('Error adding tag:', error);
     }
   };
 
-  const handleRemoveTag = (incidentId: string, tag: string) => {
-    const updated = storageUtils.removeTag(incidentId, tag);
-    setAllIncidents(updated);
-    
-    if (selectedIncident && selectedIncident.id === incidentId) {
-      const updatedIncident = updated.find(inc => inc.id === incidentId);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
-      }
+  const handleRemoveTag = async (incidentId: string, tag: string) => {
+    try {
+      const incident = await firebaseService.getIncidentById(incidentId);
+      if (!incident) return;
+      
+      const updatedTags = (incident.tags || []).filter(t => t !== tag);
+      await firebaseService.updateIncident(incidentId, { tags: updatedTags });
+    } catch (error) {
+      console.error('Error removing tag:', error);
     }
   };
 
   const getAllAvailableTags = () => {
-    return storageUtils.getAllTags();
-  };
-
-  const handleDeleteTagGlobally = (tag: string) => {
-    const updated = storageUtils.deleteTagFromAllIncidents(tag);
-    setAllIncidents(updated);
-    
-    if (selectedIncident) {
-      const updatedIncident = updated.find(inc => inc.id === selectedIncident.id);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
-      }
-    }
-    
-    setNotification({
-      type: 'success',
-      message: `✓ Etiqueta "${tag}" eliminada de todas las incidencias`,
+    const allTags = new Set<string>();
+    allIncidents.forEach(incident => {
+      incident.tags?.forEach(tag => allTags.add(tag));
     });
+    return Array.from(allTags);
   };
 
-  const handleAddPR = (incidentId: string, type: 'qa2' | 'main', link: string, description: string) => {
-    const updated = storageUtils.addPR(incidentId, type, link, description);
-    setAllIncidents(updated);
-    
-    if (selectedIncident && selectedIncident.id === incidentId) {
-      const updatedIncident = updated.find(inc => inc.id === incidentId);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
+  const handleDeleteTagGlobally = async (tag: string) => {
+    try {
+      const incidents = await firebaseService.getIncidents();
+      for (const incident of incidents) {
+        if (incident.tags?.includes(tag)) {
+          const updatedTags = incident.tags.filter(t => t !== tag);
+          await firebaseService.updateIncident(incident.id, { tags: updatedTags });
+        }
       }
+      setNotification({
+        type: 'success',
+        message: `✓ Etiqueta "${tag}" eliminada de todas las incidencias`,
+      });
+    } catch (error) {
+      console.error('Error deleting tag globally:', error);
     }
   };
 
-  const handleRemovePR = (incidentId: string, type: 'qa2' | 'main', prId: string) => {
-    const updated = storageUtils.removePR(incidentId, type, prId);
-    setAllIncidents(updated);
-    
-    if (selectedIncident && selectedIncident.id === incidentId) {
-      const updatedIncident = updated.find(inc => inc.id === incidentId);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
+  const handleAddPR = async (incidentId: string, type: 'qa2' | 'main', link: string, description: string) => {
+    try {
+      const incident = await firebaseService.getIncidentById(incidentId);
+      if (!incident) return;
+      
+      const newPR = {
+        id: `pr_${Date.now()}`,
+        link,
+        description,
+        createdAt: new Date().toISOString()
+      };
+      
+      if (type === 'qa2') {
+        const prQA2List = [...(incident.prQA2List || []), newPR];
+        await firebaseService.updateIncident(incidentId, { prQA2List });
+      } else {
+        const prMainList = [...(incident.prMainList || []), newPR];
+        await firebaseService.updateIncident(incidentId, { prMainList });
       }
+    } catch (error) {
+      console.error('Error adding PR:', error);
     }
   };
 
-  const handleUpdatePR = (incidentId: string, type: 'qa2' | 'main', prId: string, link: string, description: string) => {
-    const updated = storageUtils.updatePR(incidentId, type, prId, link, description);
-    setAllIncidents(updated);
-    
-    if (selectedIncident && selectedIncident.id === incidentId) {
-      const updatedIncident = updated.find(inc => inc.id === incidentId);
-      if (updatedIncident) {
-        setSelectedIncident(updatedIncident);
+  const handleRemovePR = async (incidentId: string, type: 'qa2' | 'main', prId: string) => {
+    try {
+      const incident = await firebaseService.getIncidentById(incidentId);
+      if (!incident) return;
+      
+      if (type === 'qa2') {
+        const prQA2List = (incident.prQA2List || []).filter(pr => pr.id !== prId);
+        await firebaseService.updateIncident(incidentId, { prQA2List });
+      } else {
+        const prMainList = (incident.prMainList || []).filter(pr => pr.id !== prId);
+        await firebaseService.updateIncident(incidentId, { prMainList });
       }
+    } catch (error) {
+      console.error('Error removing PR:', error);
     }
   };
 
-  const handleAddAutomationRule = (rule: Omit<AutomationRule, 'id' | 'createdAt'>) => {
-    const updated = storageUtils.addAutomationRule(rule);
-    setAutomationRules(updated);
+  const handleUpdatePR = async (incidentId: string, type: 'qa2' | 'main', prId: string, link: string, description: string) => {
+    try {
+      const incident = await firebaseService.getIncidentById(incidentId);
+      if (!incident) return;
+      
+      if (type === 'qa2') {
+        const prQA2List = (incident.prQA2List || []).map(pr => 
+          pr.id === prId ? { ...pr, link, description } : pr
+        );
+        await firebaseService.updateIncident(incidentId, { prQA2List });
+      } else {
+        const prMainList = (incident.prMainList || []).map(pr => 
+          pr.id === prId ? { ...pr, link, description } : pr
+        );
+        await firebaseService.updateIncident(incidentId, { prMainList });
+      }
+    } catch (error) {
+      console.error('Error updating PR:', error);
+    }
   };
 
-  const handleUpdateAutomationRule = (ruleId: string, updates: Partial<AutomationRule>) => {
-    const updated = storageUtils.updateAutomationRule(ruleId, updates);
-    setAutomationRules(updated);
+  const handleAddAutomationRule = async (rule: Omit<AutomationRule, 'id' | 'createdAt'>) => {
+    try {
+      const ruleWithDate = {
+        ...rule,
+        createdAt: new Date().toISOString()
+      };
+      await firebaseService.addAutomationRule(ruleWithDate);
+      const updated = await firebaseService.getAutomationRules();
+      setAutomationRules(updated);
+    } catch (error) {
+      console.error('Error adding automation rule:', error);
+    }
   };
 
-  const handleDeleteAutomationRule = (ruleId: string) => {
-    const updated = storageUtils.deleteAutomationRule(ruleId);
-    setAutomationRules(updated);
+  const handleUpdateAutomationRule = async (ruleId: string, updates: Partial<AutomationRule>) => {
+    try {
+      await firebaseService.updateAutomationRule(ruleId, updates);
+      const updated = await firebaseService.getAutomationRules();
+      setAutomationRules(updated);
+    } catch (error) {
+      console.error('Error updating automation rule:', error);
+    }
+  };
+
+  const handleDeleteAutomationRule = async (ruleId: string) => {
+    try {
+      await firebaseService.deleteAutomationRule(ruleId);
+      const updated = await firebaseService.getAutomationRules();
+      setAutomationRules(updated);
+    } catch (error) {
+      console.error('Error deleting automation rule:', error);
+    }
   };
 
   const handleThemeChange = (themeId: string) => {
@@ -568,6 +628,7 @@ function App() {
                 <AppearanceSettings 
                   currentTheme={currentTheme}
                   onThemeChange={handleThemeChange}
+                  currentUser={currentUser!}
                 />
               ) : settingsSection === 'general' ? (
                 <GeneralSettings />

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as firebaseService from '../firebaseService';
 import './GeneralSettings.css';
 
 interface GeneralSettingsProps {
@@ -77,15 +78,18 @@ export function GeneralSettings({ onSettingsChange }: GeneralSettingsProps) {
     }
   };
 
-  const handleExportData = () => {
+  const handleExportData = async () => {
     try {
+      const incidents = await firebaseService.getIncidents();
+      const users = await firebaseService.getUsers();
+      const automationRules = await firebaseService.getAutomationRules();
+      const appSettings = await firebaseService.getSettings();
+      
       const data = {
-        incidents: JSON.parse(localStorage.getItem('incidents') || '[]'),
-        comments: JSON.parse(localStorage.getItem('incident_comments') || '{}'),
-        automationRules: JSON.parse(localStorage.getItem('automation_rules') || '[]'),
-        systemTags: JSON.parse(localStorage.getItem('system_tags') || '[]'),
-        users: JSON.parse(localStorage.getItem('users') || '[]'),
-        settings: settings,
+        incidents,
+        users,
+        automationRules,
+        settings: appSettings || settings,
         exportDate: new Date().toISOString(),
       };
 
@@ -111,7 +115,7 @@ export function GeneralSettings({ onSettingsChange }: GeneralSettingsProps) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const data = JSON.parse(e.target?.result as string);
         
@@ -129,17 +133,30 @@ export function GeneralSettings({ onSettingsChange }: GeneralSettingsProps) {
               return;
             }
             
-            localStorage.setItem('incidents', JSON.stringify(data));
+            // Importar a Firebase
+            for (const incident of data) {
+              await firebaseService.addIncident(incident);
+            }
           } else {
-            // Si es un objeto, importar cada propiedad
-            if (data.incidents) localStorage.setItem('incidents', JSON.stringify(data.incidents));
-            if (data.comments) localStorage.setItem('incident_comments', JSON.stringify(data.comments));
-            if (data.automationRules) localStorage.setItem('automation_rules', JSON.stringify(data.automationRules));
-            if (data.systemTags) localStorage.setItem('system_tags', JSON.stringify(data.systemTags));
-            if (data.users) localStorage.setItem('users', JSON.stringify(data.users));
+            // Si es un objeto, importar cada propiedad a Firebase
+            if (data.incidents) {
+              for (const incident of data.incidents) {
+                await firebaseService.addIncident(incident);
+              }
+            }
+            if (data.users) {
+              for (const user of data.users) {
+                await firebaseService.addUser(user);
+              }
+            }
+            if (data.automationRules) {
+              for (const rule of data.automationRules) {
+                await firebaseService.addAutomationRule(rule);
+              }
+            }
             if (data.settings) {
+              await firebaseService.updateSettings(data.settings);
               setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
-              localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings));
             }
           }
 

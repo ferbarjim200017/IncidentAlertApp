@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { User } from '../types';
+import * as firebaseService from '../firebaseService';
 import './AppearanceSettings.css';
 
 interface AppearanceSettingsProps {
   onThemeChange: (theme: string) => void;
   currentTheme: string;
+  currentUser: User;
 }
 
 const themes = [
@@ -69,12 +72,22 @@ const themes = [
   }
 ];
 
-export function AppearanceSettings({ onThemeChange, currentTheme }: AppearanceSettingsProps) {
+export function AppearanceSettings({ onThemeChange, currentTheme, currentUser }: AppearanceSettingsProps) {
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
 
-  const handleThemeChange = (themeId: string) => {
+  const handleThemeChange = async (themeId: string) => {
     setSelectedTheme(themeId);
     onThemeChange(themeId);
+    
+    // Guardar en Firebase
+    try {
+      await firebaseService.updateUserPreferences(currentUser.id, {
+        ...currentUser.preferences,
+        theme: themeId
+      });
+    } catch (error) {
+      console.error('Error saving theme preference:', error);
+    }
   };
 
   return (

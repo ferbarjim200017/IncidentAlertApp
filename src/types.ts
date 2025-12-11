@@ -11,6 +11,13 @@ export interface User {
   avatar?: string;
   email?: string;
   createdAt?: string;
+  preferences?: UserPreferences;
+}
+
+export interface UserPreferences {
+  theme?: string;
+  notifications?: boolean;
+  language?: string;
 }
 
 export interface Comment {
