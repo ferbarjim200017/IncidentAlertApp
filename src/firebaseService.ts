@@ -9,7 +9,8 @@ import {
   query,
   where,
   Timestamp,
-  setDoc
+  setDoc,
+  onSnapshot
 } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import { Incident, User, Comment, TimeEntry, AutomationRule, Tag } from './types';
@@ -73,21 +74,32 @@ export const deleteUser = async (id: string): Promise<void> => {
 
 // ============ COMMENTS ============
 export const getCommentsByIncident = async (incidentId: string): Promise<Comment[]> => {
-  const q = query(collection(db, 'comments'), where('incidentId', '==', incidentId));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Comment));
+  const incident = await getIncidentById(incidentId);
+  return incident?.comments || [];
 };
 
 export const addComment = async (comment: Omit<Comment, 'id'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, 'comments'), {
+  const incident = await getIncidentById(comment.incidentId);
+  if (!incident) throw new Error('Incident not found');
+  
+  const newComment = {
     ...comment,
-    timestamp: comment.timestamp || new Date().toISOString()
-  });
-  return docRef.id;
+    id: `comment_${Date.now()}`,
+    createdAt: new Date().toISOString()
+  };
+  
+  const updatedComments = [...(incident.comments || []), newComment];
+  await updateIncident(comment.incidentId, { comments: updatedComments });
+  
+  return newComment.id;
 };
 
-export const deleteComment = async (id: string): Promise<void> => {
-  await deleteDoc(doc(db, 'comments', id));
+export const deleteComment = async (incidentId: string, commentId: string): Promise<void> => {
+  const incident = await getIncidentById(incidentId);
+  if (!incident) throw new Error('Incident not found');
+  
+  const updatedComments = incident.comments?.filter(c => c.id !== commentId);
+  await updateIncident(incidentId, { comments: updatedComments });
 };
 
 // ============ TIME ENTRIES ============
@@ -172,6 +184,21 @@ export const getSettings = async (): Promise<any> => {
 export const updateSettings = async (settings: any): Promise<void> => {
   const docRef = doc(db, 'settings', 'app');
   await setDoc(docRef, settings, { merge: true });
+};
+
+// ============ REAL-TIME LISTENERS ============
+export const subscribeToIncidents = (callback: (incidents: Incident[]) => void) => {
+  return onSnapshot(collection(db, 'incidents'), (snapshot) => {
+    const incidents = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Incident));
+    callback(incidents);
+  });
+};
+
+export const subscribeToUsers = (callback: (users: User[]) => void) => {
+  return onSnapshot(collection(db, 'users'), (snapshot) => {
+    const users = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as User));
+    callback(users);
+  });
 };
 
 // ============ INITIALIZE DEFAULT DATA ============

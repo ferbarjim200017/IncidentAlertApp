@@ -81,10 +81,6 @@ function App() {
         const user = authUtils.getCurrentUser();
         setCurrentUser(user);
         
-        // Cargar incidencias desde Firebase
-        const loadedIncidents = await firebaseService.getIncidents();
-        setAllIncidents(loadedIncidents);
-        
         // Cargar reglas de automatización
         const loadedRules = await firebaseService.getAutomationRules();
         setAutomationRules(loadedRules);
@@ -93,7 +89,7 @@ function App() {
         const urlParams = new URLSearchParams(window.location.search);
         const incidentId = urlParams.get('incident');
         if (incidentId) {
-          const incident = loadedIncidents.find(inc => inc.id === incidentId);
+          const incident = await firebaseService.getIncidentById(incidentId);
           if (incident) {
             setSelectedIncident(incident);
             setActiveTab('incident-detail');
@@ -106,6 +102,25 @@ function App() {
     };
     
     loadData();
+    
+    // Suscribirse a cambios en tiempo real
+    const unsubscribe = firebaseService.subscribeToIncidents((incidents) => {
+      console.log('Incidencias actualizadas en tiempo real:', incidents);
+      setAllIncidents(incidents);
+      
+      // Actualizar incidente seleccionado si está abierto
+      if (selectedIncident) {
+        const updated = incidents.find(inc => inc.id === selectedIncident.id);
+        if (updated) {
+          setSelectedIncident(updated);
+        }
+      }
+    });
+    
+    return () => {
+      // Cleanup: desuscribirse cuando el componente se desmonte
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -125,12 +140,8 @@ function App() {
       // Aplicar reglas de automatización al crear
       const processedIncident = storageUtils.applyAutomationRules(incidentWithUser, 'on-create');
       
-      // Guardar en Firebase
+      // Guardar en Firebase (el listener actualizará automáticamente)
       await firebaseService.addIncident(processedIncident);
-      
-      // Recargar incidencias
-      const updated = await firebaseService.getIncidents();
-      setAllIncidents(updated);
       
       setNotification({
         type: 'success',
@@ -150,24 +161,10 @@ function App() {
     console.log('handleUpdateIncident llamado con:', incident);
     
     try {
-      // Actualizar en Firebase
+      // Actualizar en Firebase (el listener actualizará automáticamente el estado)
       await firebaseService.updateIncident(incident.id, incident);
       
-      // Recargar incidencias
-      const updated = await firebaseService.getIncidents();
-      console.log('Incidentes actualizados:', updated);
-      setAllIncidents(updated);
       setEditingIncident(null);
-      
-      // Actualizar el incidente seleccionado con la versión actualizada
-      const updatedIncident = updated.find(inc => inc.id === incident.id);
-      if (updatedIncident && selectedIncident?.id === incident.id) {
-        setSelectedIncident(updatedIncident);
-        // Actualizar también en openIncidents si está abierto
-        setOpenIncidents(openIncidents.map(inc => 
-          inc.id === incident.id ? updatedIncident : inc
-        ));
-      }
       
       // Mostrar notificación de éxito
       console.log('Mostrando notificación');
@@ -187,9 +184,9 @@ function App() {
 
   const handleDeleteIncident = async (id: string) => {
     try {
+      // Eliminar de Firebase (el listener actualizará automáticamente)
       await firebaseService.deleteIncident(id);
-      const updated = await firebaseService.getIncidents();
-      setAllIncidents(updated);
+      
       // Remover de pestañas abiertas si está
       setOpenIncidents(openIncidents.filter(inc => inc.id !== id));
       if (selectedIncident?.id === id) {
@@ -231,19 +228,8 @@ function App() {
         timestamp: new Date().toISOString()
       };
       
+      // Guardar en Firebase (el listener actualizará automáticamente)
       await firebaseService.addComment(comment);
-      
-      // Recargar incidencias
-      const updated = await firebaseService.getIncidents();
-      setAllIncidents(updated);
-      
-      // Actualizar el incidente seleccionado si está abierto
-      if (selectedIncident && selectedIncident.id === incidentId) {
-        const updatedIncident = updated.find(inc => inc.id === incidentId);
-        if (updatedIncident) {
-          setSelectedIncident(updatedIncident);
-        }
-      }
     } catch (error) {
       console.error('Error adding comment:', error);
     }
