@@ -742,3 +742,170 @@
     font-size: 1rem;
   }
 }
+
+/* Mobile Menu Trigger */
+.mobile-menu-trigger {
+  display: none;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.mobile-menu-trigger:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: scale(1.05);
+}
+
+.mobile-menu-trigger:active {
+  transform: scale(0.95);
+}
+
+.keyboard-shortcut-trigger {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.keyboard-shortcut-trigger:hover {
+  transform: translateY(-2px);
+}
+
+/* Responsive: Mostrar menú hamburguesa en móvil */
+@media (max-width: 768px) {
+  .mobile-menu-trigger {
+    display: flex;
+  }
+
+  .app-header-content {
+    display: flex;
+    align-items: center;
+  }
+
+  .tabs {
+    display: none;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .app-header-actions {
+    gap: 0.5rem;
+  }
+
+  .app-header-badge {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .btn-logout {
+    padding: 0.5rem 0.75rem;
+    min-width: auto;
+  }
+
+  .settings-container {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #e5e7eb;
+    max-height: none;
+  }
+
+  .settings-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.25rem;
+  }
+
+  .settings-menu-item {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Ocultar texto en botones pequeños */
+  .incident-list {
+    padding: 1rem;
+  }
+
+  /* Ajustar formularios */
+  .incident-form,
+  .incident-edit-form {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Dashboard responsive */
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+
+  /* Quick incidents en móvil */
+  .quick-incidents {
+    padding: 1rem;
+  }
+}
+
+/* Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-container {
+    gap: 1.5rem;
+  }
+
+  .settings-sidebar {
+    width: 200px;
+  }
+}
+
+/* Touch devices: mejorar áreas táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .app-header-badge,
+  .btn-logout,
+  .tab-button,
+  .settings-menu-item {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  .incident-item {
+    padding: 1.25rem;
+  }
+
+  button {
+    min-height: 44px;
+  }
+}
+
+/* Animaciones suaves para mobile */
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-menu,
+  .mobile-menu-overlay {
+    transition: all 0.3s ease-in-out;
+  }
+}
+

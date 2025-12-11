@@ -23,6 +23,11 @@ import { GeneralSettings } from './components/GeneralSettings';
 import { Login } from './components/Login';
 import { UserProfile } from './components/UserProfile';
 import RoleManagement from './components/RoleManagement';
+import MobileMenu from './components/MobileMenu';
+import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp';
+import QuickSearch from './components/QuickSearch';
+import OnboardingTour from './components/OnboardingTour';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { themes } from './components/AppearanceSettings';
 import './App.css';
 
@@ -41,6 +46,11 @@ function App() {
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string; incidentId?: string } | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+  const [showQuickSearch, setShowQuickSearch] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // Filtrar incidencias del usuario actual
   const incidents = currentUser ? allIncidents.filter(inc => inc.userId === currentUser.id) : [];
@@ -151,6 +161,72 @@ function App() {
       unsubscribe();
     };
   }, []);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    enabled: currentUser !== null && !showKeyboardHelp,
+    shortcuts: [
+      {
+        key: 'k',
+        ctrl: true,
+        callback: () => setShowQuickSearch(true),
+        description: 'Búsqueda rápida'
+      },
+      {
+        key: 'n',
+        callback: () => {
+          if (activeTab !== 'new-incident') {
+            handleTabChange('new-incident');
+          }
+        },
+        description: 'Nueva incidencia'
+      },
+      {
+        key: 'e',
+        callback: () => {
+          if (selectedIncident && activeTab === 'incident-detail') {
+            setEditingIncident(selectedIncident);
+          }
+        },
+        description: 'Editar incidencia'
+      },
+      {
+        key: '?',
+        shift: true,
+        callback: () => setShowKeyboardHelp(true),
+        description: 'Mostrar ayuda'
+      },
+      {
+        key: 'Escape',
+        callback: () => {
+          if (showQuickSearch) setShowQuickSearch(false);
+          if (showKeyboardHelp) setShowKeyboardHelp(false);
+          if (editingIncident) setEditingIncident(null);
+        },
+        description: 'Cerrar modal'
+      }
+    ]
+  });
+
+  // Detector de tamaño de pantalla para responsive
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Verificar si es primera vez del usuario para onboarding
+  useEffect(() => {
+    if (currentUser) {
+      const hasSeenOnboarding = localStorage.getItem(`onboarding_completed_${currentUser.id}`);
+      if (!hasSeenOnboarding) {
+        setTimeout(() => setShowOnboarding(true), 1000);
+      }
+    }
+  }, [currentUser]);
 
   // Cargar rol del usuario cuando cambie el currentUser
   useEffect(() => {
@@ -326,6 +402,17 @@ function App() {
     }
   };
 
+  const handleOnboardingComplete = () => {
+    if (currentUser) {
+      localStorage.setItem(`onboarding_completed_${currentUser.id}`, 'true');
+    }
+    setShowOnboarding(false);
+  };
+
+  const handleSelectFromQuickSearch = (incident: Incident) => {
+    handleViewIncident(incident);
+  };
+
   const getAllAvailableTags = () => {
     const allTags = new Set<string>();
     allIncidents.forEach(incident => {
@@ -495,26 +582,45 @@ function App() {
     <div className="app-container">
       <header className="app-header">
         <div className="app-header-content">
+          {isMobile && (
+            <button 
+              className="mobile-menu-trigger" 
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Abrir menú"
+            >
+              ☰
+            </button>
+          )}
           <Logo />
         </div>
         <div className="app-header-actions">
+          <button 
+            className="app-header-badge keyboard-shortcut-trigger"
+            onClick={() => setShowKeyboardHelp(true)}
+            title="Atajos de teclado (Shift + ?)"
+          >
+            <span className="badge-icon">⌨️</span>
+            {!isMobile && <span className="badge-text">Atajos</span>}
+          </button>
           <div className="user-info">
             <span className="user-name">👤 {currentUser.name}</span>
             <button className="btn-logout" onClick={handleLogout} title="Cerrar sesión">
-              🚪 Salir
+              🚪 {isMobile ? '' : 'Salir'}
             </button>
           </div>
           <div className="app-header-badge" onClick={() => setShowAlerts(!showAlerts)}>
             <span className="badge-icon">🔔</span>
-            <span className="badge-text">Alertas</span>
+            {!isMobile && <span className="badge-text">Alertas</span>}
             {incidents.filter(inc => inc.priority === 'crítica' && inc.status !== 'resuelta' && inc.status !== 'cerrada').length > 0 && (
               <span className="alerts-count">{incidents.filter(inc => inc.priority === 'crítica' && inc.status !== 'resuelta' && inc.status !== 'cerrada').length}</span>
             )}
           </div>
-          <div className="app-header-badge" onClick={() => handleTabChange('settings')}>
-            <span className="badge-icon">⚙️</span>
-            <span className="badge-text">Ajustes</span>
-          </div>
+          {!isMobile && (
+            <div className="app-header-badge" onClick={() => handleTabChange('settings')}>
+              <span className="badge-icon">⚙️</span>
+              <span className="badge-text">Ajustes</span>
+            </div>
+          )}
         </div>
       </header>
 
@@ -737,6 +843,40 @@ function App() {
           onCancel={() => setEditingIncident(null)}
         />
       )}
+
+      {/* Mobile Menu */}
+      {isMobile && (
+        <MobileMenu
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+          currentTab={activeTab}
+          onTabChange={handleTabChange}
+          onLogout={handleLogout}
+          userRole={userRole?.name}
+          userName={currentUser.name}
+        />
+      )}
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp
+        isOpen={showKeyboardHelp}
+        onClose={() => setShowKeyboardHelp(false)}
+      />
+
+      {/* Quick Search (Ctrl+K) */}
+      <QuickSearch
+        isOpen={showQuickSearch}
+        onClose={() => setShowQuickSearch(false)}
+        incidents={allIncidents}
+        onSelectIncident={handleSelectFromQuickSearch}
+      />
+
+      {/* Onboarding Tour */}
+      <OnboardingTour
+        isActive={showOnboarding}
+        onComplete={handleOnboardingComplete}
+        onSkip={handleOnboardingComplete}
+      />
     </div>
   );
 }
