@@ -78,15 +78,26 @@ function App() {
         // Inicializar datos por defecto en Firebase
         await firebaseService.initializeDefaultData();
         
-        // Verificar si hay usuario autenticado
-        const user = authUtils.getCurrentUser();
-        setCurrentUser(user);
+        // Verificar si hay usuario autenticado en localStorage
+        const localUser = authUtils.getCurrentUser();
         
-        // Cargar tema del usuario desde Firebase
-        if (user) {
-          const preferences = await firebaseService.getUserPreferences(user.id);
-          if (preferences.theme) {
-            setCurrentTheme(preferences.theme);
+        if (localUser) {
+          // Obtener usuario actualizado desde Firebase
+          const updatedUser = await firebaseService.getUserByUsername(localUser.username);
+          if (updatedUser) {
+            // Actualizar usuario en localStorage con datos de Firebase
+            localStorage.setItem('current_user', JSON.stringify(updatedUser));
+            setCurrentUser(updatedUser);
+            
+            // Cargar tema del usuario desde Firebase
+            const preferences = await firebaseService.getUserPreferences(updatedUser.id);
+            if (preferences.theme) {
+              setCurrentTheme(preferences.theme);
+            }
+          } else {
+            // Usuario no existe en Firebase, cerrar sesión
+            authUtils.logout();
+            setCurrentUser(null);
           }
         }
         
@@ -456,8 +467,15 @@ function App() {
     }
   }, [currentTheme]);
 
-  const handleLogin = (user: User) => {
-    setCurrentUser(user);
+  const handleLogin = async (user: User) => {
+    // Obtener usuario actualizado desde Firebase para asegurar datos correctos
+    const updatedUser = await firebaseService.getUserByUsername(user.username);
+    if (updatedUser) {
+      localStorage.setItem('current_user', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+    } else {
+      setCurrentUser(user);
+    }
   };
 
   const handleLogout = () => {
