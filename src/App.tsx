@@ -600,11 +600,7 @@ function App() {
         </main>
       ) : activeTab === 'new-incident' ? (
         <main className="app-main page-transition-enter">
-          <div className="new-incident-section">
-            <div className="form-section-centered">
-              <IncidentForm onAdd={handleAddIncident} />
-            </div>
-          </div>
+          <IncidentForm onAdd={handleAddIncident} />
         </main>
       ) : activeTab === 'incident-detail' && selectedIncident ? (
         <main className="incident-detail-main">
