@@ -1,6 +1,9 @@
 import './Logo.css';
 
 export function Logo() {
+  // Detectar si estamos en QA2 (Vercel configura VITE_VERCEL_GIT_COMMIT_REF automáticamente)
+  const isQA2 = import.meta.env.VITE_VERCEL_GIT_COMMIT_REF === 'QA2';
+  
   return (
     <div className="logo-container">
       <div className="logo-icon">
@@ -55,6 +58,20 @@ export function Logo() {
       </div>
       <div className="logo-text">
         <h1>IncidentAlert</h1>
+        {isQA2 && (
+          <span style={{ 
+            fontSize: '0.7rem', 
+            color: '#FFA726', 
+            fontWeight: 'bold',
+            marginLeft: '0.5rem',
+            padding: '0.2rem 0.5rem',
+            background: 'rgba(255, 167, 38, 0.1)',
+            borderRadius: '4px',
+            border: '1px solid #FFA726'
+          }}>
+            🚧 QA2
+          </span>
+        )}
       </div>
     </div>
   );
