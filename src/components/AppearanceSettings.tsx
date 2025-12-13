@@ -92,10 +92,12 @@ export function AppearanceSettings({ onThemeChange, currentTheme, currentUser }:
 
   return (
     <div className="appearance-settings">
-      <h3>🎨 Apariencia</h3>
-      <p className="appearance-description">
-        Personaliza el color de fondo de la aplicación según tus preferencias
-      </p>
+      <div className="settings-header">
+        <h2>🎨 Apariencia</h2>
+        <p className="settings-description">
+          Personaliza el color de fondo de la aplicación según tus preferencias
+        </p>
+      </div>
 
       <div className="theme-grid">
         {themes.map((theme) => (

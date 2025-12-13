@@ -5,20 +5,23 @@
   min-height: 600px;
 }
 
-.role-header {
+.settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
-.role-header h2 {
-  color: #2d3748;
-  font-size: 1.8rem;
+.settings-header h2 {
+  font-size: 2rem;
   margin-bottom: 0.5rem;
+  color: #2d3748;
+  font-weight: 700;
 }
 
-.role-description {
+.settings-description {
   color: #718096;
   font-size: 0.95rem;
 }

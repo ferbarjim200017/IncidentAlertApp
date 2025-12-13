@@ -3,18 +3,25 @@
   min-height: 600px;
 }
 
-.user-management-header {
+.settings-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
-.user-management-header h3 {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #667eea;
+.settings-header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+  font-weight: 700;
+}
+
+.settings-description {
+  color: #718096;
+  font-size: 0.95rem;
 }
 
 .btn-create-user {

@@ -3,18 +3,22 @@
   min-height: 600px;
 }
 
-.appearance-settings h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #667eea;
+.settings-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
-.appearance-description {
-  color: #666;
-  font-size: 1.05rem;
-  margin-bottom: 2rem;
-  line-height: 1.6;
+.settings-header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+  font-weight: 700;
+}
+
+.settings-description {
+  color: #718096;
+  font-size: 0.95rem;
 }
 
 .theme-grid {
