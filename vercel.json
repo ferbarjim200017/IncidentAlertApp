@@ -8,5 +8,8 @@
   "github": {
     "enabled": true,
     "autoAlias": true
-  }
+  },
+  "alias": [
+    "incident-alert-app-qa2"
+  ]
 }
