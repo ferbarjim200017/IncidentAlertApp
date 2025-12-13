@@ -119,7 +119,7 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({
                   </button>
                   <h1>{incident.name}</h1>
                 </div>
-                <ExcelExport incident={incident} currentUser={incidentOwnerName} />
+                <ExcelExport incident={incident} currentUser={currentUserName} />
               </div>
               <div className="incident-badges">
                 <span className={`badge-status status-${incident.status}`}>
