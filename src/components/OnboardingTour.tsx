@@ -103,7 +103,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, o
       <div className="tour-tooltip-modal">
         <div className="tour-tooltip-header">
           <h3 className="tour-tooltip-title">{step.title}</h3>
-          <button className="tour-tooltip-close" onClick={onSkip} title="Cerrar tour">✕</button>
+          <button className="btn-close-modal" onClick={onSkip} title="Cerrar tour">✕</button>
         </div>
         
         <div className="tour-tooltip-content">

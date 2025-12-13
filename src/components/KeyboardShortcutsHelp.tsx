@@ -54,7 +54,7 @@ const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({ isOpen, o
       <div className="shortcuts-modal" onClick={(e) => e.stopPropagation()}>
         <div className="shortcuts-header">
           <h2>⌨️ Atajos de Teclado</h2>
-          <button className="shortcuts-close" onClick={onClose}>✕</button>
+          <button className="btn-close-modal" onClick={onClose}>✕</button>
         </div>
         
         <div className="shortcuts-content">
