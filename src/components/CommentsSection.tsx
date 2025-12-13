@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Comment } from '../types';
 import './CommentsSection.css';
@@ -16,6 +16,19 @@ export function CommentsSection({ incidentId, comments, onAddComment, onDeleteCo
   const [author, setAuthor] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
+
+  useEffect(() => {
+    if (!showModal) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showModal]);
 
   const handleDelete = (e: React.MouseEvent, commentId: string) => {
     e.stopPropagation(); // Evitar que se abra el modal al eliminar

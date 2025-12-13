@@ -867,7 +867,7 @@ function App() {
       <QuickSearch
         isOpen={showQuickSearch}
         onClose={() => setShowQuickSearch(false)}
-        incidents={allIncidents}
+        incidents={incidents}
         onSelectIncident={handleSelectFromQuickSearch}
       />
 

@@ -52,6 +52,19 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete, o
     }
   }, [isActive, currentStep]);
 
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onSkip();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isActive, onSkip]);
+
   const handleNext = () => {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep(currentStep + 1);
