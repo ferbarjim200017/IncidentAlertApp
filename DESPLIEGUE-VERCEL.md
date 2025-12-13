@@ -8,7 +8,7 @@ Este proyecto tiene dos ramas principales:
 
 ## 🚀 Despliegue en Vercel
 
-### Opción 1: Configuración Automática (Recomendado)
+### Paso 1: Configuración Inicial en Vercel
 
 1. **Accede a Vercel**
    - Ve a: https://vercel.com
@@ -23,28 +23,62 @@ Este proyecto tiene dos ramas principales:
    - **Framework Preset**: Vite
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
+   - **Production Branch**: `main`
    - Click en "Deploy"
 
-4. **Habilitar Despliegues por Rama**
-   - Una vez desplegado, ve a: "Settings" → "Git"
-   - En "Production Branch", asegúrate que está en `main`
-   - Habilita "Automatic Deployments from Git branches"
-   - Vercel creará automáticamente URLs para cada rama
+4. **Obtener Tokens para Despliegue Automático**
+   - Ve a tu perfil: https://vercel.com/account/tokens
+   - Click en "Create Token"
+   - Nombre: "GitHub Actions Deploy"
+   - Scope: "Full Account"
+   - Copia el token (guárdalo, no se mostrará de nuevo)
+
+5. **Obtener IDs del Proyecto**
+   - En tu proyecto de Vercel, ve a "Settings" → "General"
+   - Copia el **Project ID**
+   - Ve a tu perfil → "Settings" → "General"
+   - Copia el **Team/Org ID** (o usa tu User ID si es personal)
+
+### Paso 2: Configurar Secrets en GitHub
+
+1. **Ve a tu repositorio en GitHub**
+   - https://github.com/ferbarjim200017/IncidentAlertApp
+
+2. **Configurar Secrets**
+   - Click en "Settings" → "Secrets and variables" → "Actions"
+   - Click en "New repository secret"
+   
+3. **Agregar estos 3 secrets:**
+   - **VERCEL_TOKEN**: El token que generaste en Vercel
+   - **VERCEL_ORG_ID**: Tu Team/Org ID de Vercel
+   - **VERCEL_PROJECT_ID**: El Project ID de tu proyecto
+
+### Paso 3: Activar Despliegues Automáticos
+
+Una vez configurados los secrets, los GitHub Actions se activarán automáticamente:
+- Cada push a **main** desplegará a producción
+- Cada push a **QA2** desplegará a preview/QA
 
 ### URLs que obtendrás:
+
+**Ambas ramas se despliegan en Vercel:**
 
 **Main (Producción)**:
 ```
 https://incident-alert-app.vercel.app
-https://incident-alert-app-git-main-ferbarjim200017.vercel.app
+https://incident-alert-app-git-main-[tu-username].vercel.app
 ```
 
-**QA2 (Pre-producción)**:
+**QA2 (Pre-producción/Testing)**:
 ```
-https://incident-alert-app-git-qa2-ferbarjim200017.vercel.app
+https://incident-alert-app-git-qa2-[tu-username].vercel.app
 ```
 
-### Opción 2: Usando Vercel CLI
+**¿Dónde ver las URLs?**
+- Vercel Dashboard: https://vercel.com/dashboard
+- O en el log de GitHub Actions después de cada despliegue
+
+### Despliegue Manual (Opcional)
 
 ```bash
 # Instalar Vercel CLI
