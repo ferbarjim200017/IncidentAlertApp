@@ -22,12 +22,14 @@ interface IncidentDetailProps {
   onAddPR: (incidentId: string, type: 'qa2' | 'main', link: string, description: string) => void;
   onRemovePR: (incidentId: string, type: 'qa2' | 'main', prId: string) => void;
   onUpdatePR: (incidentId: string, type: 'qa2' | 'main', prId: string, link: string, description: string) => void;
+  currentUserName: string;
 }
 
 export const IncidentDetail: React.FC<IncidentDetailProps> = ({
   incident: incidentProp,
   onUpdate,
   onBack,
+  currentUserName,
   onAddComment,
   onUpdateComment,
   onDeleteComment,
@@ -117,7 +119,7 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({
                   </button>
                   <h1>{incident.name}</h1>
                 </div>
-                <ExcelExport incident={incident} currentUser={incidentOwnerName} />
+                <ExcelExport incident={incident} currentUser={currentUserName} />
               </div>
               <div className="incident-badges">
                 <span className={`badge-status status-${incident.status}`}>
@@ -339,7 +341,7 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({
               incidentName={incident.name}
               prQA2List={incident.prQA2List || []}
               prMainList={incident.prMainList || []}
-              ownerName={incidentOwnerName}
+              ownerName={currentUserName}
               onAddPR={onAddPR}
               onRemovePR={onRemovePR}
               onUpdatePR={onUpdatePR}

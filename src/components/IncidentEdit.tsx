@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Incident, IncidentStatus, IncidentPriority, IncidentType } from '../types';
 import './IncidentEdit.css';
 
@@ -17,6 +17,17 @@ export const IncidentEdit: React.FC<IncidentEditProps> = ({ incident, onSave, on
   const [status, setStatus] = useState<IncidentStatus>(incident.status);
   const [priority, setPriority] = useState<IncidentPriority>(incident.priority);
   const [type, setType] = useState<IncidentType>(incident.type);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCancel();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onCancel]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

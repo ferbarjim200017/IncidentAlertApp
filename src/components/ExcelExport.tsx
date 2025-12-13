@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Incident } from '../types';
 import './ExcelExport.css';
@@ -11,6 +11,19 @@ interface ExcelExportProps {
 export function ExcelExport({ incident, currentUser }: ExcelExportProps) {
   const [showModal, setShowModal] = useState(false);
   const [deploymentDate, setDeploymentDate] = useState('');
+
+  useEffect(() => {
+    if (!showModal) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowModal(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showModal]);
 
   const getPRNumbers = (prList: any[] | undefined): string => {
     if (!prList || prList.length === 0) return '-';

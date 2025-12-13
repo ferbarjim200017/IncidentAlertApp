@@ -33,6 +33,20 @@ export const AllIncidentsTable: React.FC<AllIncidentsTableProps> = ({
     setSearchResults(incidents || []);
   }, [incidents]);
 
+  // Listener para cerrar modal con Escape
+  useEffect(() => {
+    if (!deleteConfirm.show) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDeleteConfirm({ show: false, incident: null });
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [deleteConfirm.show]);
+
   const handleSort = (field: keyof Incident) => {
     const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
     setSortField(field);

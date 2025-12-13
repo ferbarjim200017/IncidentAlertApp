@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { QATableExport } from './QATableExport';
 import { MainTableExport } from './MainTableExport';
@@ -36,6 +36,19 @@ export const PRManager: React.FC<PRManagerProps> = ({
   const [showModalMain, setShowModalMain] = useState(false);
   const [editingPR, setEditingPR] = useState<{ pr: PR; type: 'qa2' | 'main' } | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  useEffect(() => {
+    if (!showModalQA2 && !showModalMain) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseModal(showModalQA2 ? 'qa2' : 'main');
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showModalQA2, showModalMain]);
 
   const handleSubmitQA2 = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
