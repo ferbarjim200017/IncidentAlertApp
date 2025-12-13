@@ -55,15 +55,6 @@ export function Logo() {
       </div>
       <div className="logo-text">
         <h1>IncidentAlert</h1>
-        <span style={{ 
-          fontSize: '0.7rem', 
-          color: '#FFA726', 
-          fontWeight: 'bold',
-          marginLeft: '0.5rem',
-          padding: '0.2rem 0.5rem',
-          background: 'rgba(255, 167, 38, 0.1)',
-          borderRadius: '4px'
-        }}>QA2 🚧</span>
       </div>
     </div>
   );
