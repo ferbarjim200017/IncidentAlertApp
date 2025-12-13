@@ -724,6 +724,7 @@ function App() {
             onAddPR={handleAddPR}
             onRemovePR={handleRemovePR}
             onUpdatePR={handleUpdatePR}
+            currentUserName={currentUser!.name}
             onBack={() => {
               setSelectedIncident(null);
               setActiveTab('all-incidents');
