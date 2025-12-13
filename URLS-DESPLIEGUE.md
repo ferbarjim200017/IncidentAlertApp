@@ -1,77 +1,62 @@
 # 🌐 URLs de Despliegue
 
-## ✅ Estado Actual
+## ✅ Estado Actual - URLs PERMANENTES
 
 ### 🔴 Producción (Main)
-**URLs permanentes:**
-- https://incident-alert-app.vercel.app ← **URL principal**
-- https://incident-alert-app-fernando-barreras-projects.vercel.app
-- https://incident-alert-app-ferbarjim200017-fernando-barreras-projects.vercel.app
+**URL permanente:**
+- https://incident-alert-app.vercel.app ← **URL PRINCIPAL DE PRODUCCIÓN**
 
 ### 🟡 QA2 (Testing/Preview)
-**URLs de despliegue:**
+**URL permanente:**
+- https://incident-alert-app-qa2.vercel.app ← **URL PERMANENTE DE QA2** ✅
 
-Vercel crea URLs únicas por cada commit en QA2, algo como:
-- `https://incident-alert-[hash]-fernando-barreras-projects.vercel.app`
+---
 
-**Para ver la URL actual de QA2:**
-1. Ve a: https://vercel.com/dashboard
-2. Busca tu proyecto "incident-alert-app"
-3. Verás todos los despliegues con sus ramas
-4. Los de QA2 tendrán el tag "Preview"
+## 🎉 ¡AMBAS RAMAS TIENEN URLs PERMANENTES!
 
-**O ve a GitHub Actions:**
-1. https://github.com/ferbarjim200017/IncidentAlertApp/actions
-2. Click en el último workflow de QA2
-3. En los logs verás la URL de despliegue
+**Main (Producción):**
+```
+https://incident-alert-app.vercel.app
+```
+
+**QA2 (Testing):**
+```
+https://incident-alert-app-qa2.vercel.app
+```
+
+Estas URLs **nunca cambian** y siempre apuntan a la última versión de cada rama
 
 ---
 
 ## 🔍 Cómo funciona
 
 ### Main (Producción)
-- Tiene URLs permanentes que **nunca cambian**
-- Cada push actualiza el contenido en las mismas URLs
+- URL permanente: `incident-alert-app.vercel.app`
+- Cada push a **main** actualiza automáticamente esta URL
+- Siempre muestra la última versión de producción
 
-### QA2 (Preview)
-- Cada push crea una **URL única** nueva
-- Esto es por diseño de Vercel para previews
-- Puedes ver todas las URLs en el dashboard
-
----
-
-## 🎯 Solución: URL Permanente para QA2
-
-Si quieres una URL permanente para QA2, hay 3 opciones:
-
-### Opción 1: Usar "Latest" de Preview
-En Vercel dashboard:
-1. Ve a tu proyecto → Settings → Domains
-2. Click "Add Domain"
-3. Agrega: `incident-alert-app-qa2.vercel.app`
-4. Asigna este dominio a la rama "QA2"
-
-### Opción 2: Cambiar rama de producción temporalmente
-- Puedes hacer que QA2 sea la rama de producción temporalmente
-- Esto le dará la URL principal mientras pruebas
-
-### Opción 3: Usar dominios personalizados
-- Comprar un dominio (ej: `qa2.tudominio.com`)
-- Configurarlo para apuntar siempre a QA2
+### QA2 (Testing)
+- URL permanente: `incident-alert-app-qa2.vercel.app`
+- Cada push a **QA2** actualiza automáticamente esta URL
+- Siempre muestra la última versión de QA2 para testing
 
 ---
 
-## 📊 Resumen
+## 📊 Configuración Completa
 
-**Actualmente tienes:**
-- ✅ 1 dominio permanente para Main (producción)
-- ✅ URLs de preview para cada commit de QA2 (por diseño)
+✅ **Dominios configurados en Vercel:**
+- `incident-alert-app.vercel.app` → Rama: main
+- `incident-alert-app-qa2.vercel.app` → Rama: QA2
 
-**Esto es normal en Vercel:**
-- Producción = URL fija
-- Preview (otras ramas) = URLs dinámicas por commit
+✅ **GitHub Actions configurados:**
+- Push a main → Despliega en producción
+- Push a QA2 → Despliega en preview/testing
 
-Si necesitas URL fija para QA2, puedo ayudarte a configurar la Opción 1.
+✅ **Workflow:**
+1. Desarrollas en QA2
+2. Push a QA2 → https://incident-alert-app-qa2.vercel.app se actualiza
+3. Pruebas en QA2
+4. Merge a main → https://incident-alert-app.vercel.app se actualiza
 
 ---
 
