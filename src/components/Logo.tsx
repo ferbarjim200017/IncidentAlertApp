@@ -1,8 +1,10 @@
 import './Logo.css';
 
 export function Logo() {
-  // Detectar si estamos en QA2 (Vercel configura VITE_VERCEL_GIT_COMMIT_REF automáticamente)
-  const isQA2 = import.meta.env.VITE_VERCEL_GIT_COMMIT_REF === 'QA2';
+  // Detectar si estamos en QA2 usando la URL o variable de entorno
+  const isQA2 = window.location.hostname.includes('qa2') || 
+                window.location.hostname.includes('QA2') ||
+                import.meta.env.VITE_VERCEL_GIT_COMMIT_REF === 'QA2';
   
   return (
     <div className="logo-container">
