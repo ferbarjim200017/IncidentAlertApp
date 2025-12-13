@@ -1,5 +1,6 @@
 .appearance-settings {
   width: 100%;
+  min-height: 600px;
 }
 
 .appearance-settings h3 {

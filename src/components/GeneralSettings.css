@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: 2rem;
   animation: fadeIn 0.3s ease-in;
+  min-height: 600px;
 }
 
 .settings-header {

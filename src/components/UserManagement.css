@@ -1,5 +1,6 @@
 .user-management {
   width: 100%;
+  min-height: 600px;
 }
 
 .user-management-header {
