@@ -19,6 +19,7 @@ interface AppSettings {
   confirmBeforeDelete: boolean;
   autoRefresh: boolean;
   autoRefreshInterval: number;
+  navigateToDetailAfterCreate: boolean;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -34,6 +35,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   confirmBeforeDelete: true,
   autoRefresh: false,
   autoRefreshInterval: 60000,
+  navigateToDetailAfterCreate: false,
 };
 
 const SETTINGS_KEY = 'app_general_settings';
@@ -331,6 +333,21 @@ export function GeneralSettings({ onSettingsChange }: GeneralSettingsProps) {
         {/* Comportamiento */}
         <section className="settings-section">
           <h3>⚡ Comportamiento</h3>
+          
+          <div className="setting-item">
+            <div>
+              <div className="setting-label">Navegar al detalle tras crear incidencia</div>
+              <div className="setting-description">Abrir automáticamente la vista de detalle al crear una nueva incidencia</div>
+            </div>
+            <label className="toggle-switch">
+              <input 
+                type="checkbox"
+                checked={settings.navigateToDetailAfterCreate}
+                onChange={(e) => handleSettingChange('navigateToDetailAfterCreate', e.target.checked)}
+              />
+              <span className="toggle-slider"></span>
+            </label>
+          </div>
           
           <div className="setting-item">
             <div>

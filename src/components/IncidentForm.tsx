@@ -4,9 +4,10 @@ import './IncidentForm.css';
 
 interface IncidentFormProps {
   onAdd: (incident: Incident) => void;
+  onNavigateToDetail?: (incident: Incident) => void;
 }
 
-export const IncidentForm: React.FC<IncidentFormProps> = ({ onAdd }) => {
+export const IncidentForm: React.FC<IncidentFormProps> = ({ onAdd, onNavigateToDetail }) => {
   const [name, setName] = useState('MOV-');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -49,6 +50,12 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({ onAdd }) => {
     };
 
     onAdd(newIncident);
+    
+    // Si está configurado, navegar al detalle de la incidencia
+    if (onNavigateToDetail) {
+      onNavigateToDetail(newIncident);
+    }
+    
     setName('MOV-');
     setTitle('');
     setDescription('');

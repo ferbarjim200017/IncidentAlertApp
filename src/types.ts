@@ -17,6 +17,7 @@ export interface UserPreferences {
   theme?: string;
   notifications?: boolean;
   language?: string;
+  navigateToDetailAfterCreate?: boolean;
 }
 
 export interface Role {

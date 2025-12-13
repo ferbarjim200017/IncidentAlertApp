@@ -271,13 +271,21 @@ function App() {
         message: `✓ Incidencia "${incident.name}" creada correctamente`,
         incidentId: incident.id,
       });
+      
+      return processedIncident;
     } catch (error) {
       console.error('Error adding incident:', error);
       setNotification({
         type: 'error',
         message: 'Error al crear la incidencia. Intenta nuevamente.',
       });
+      throw error;
     }
+  };
+
+  const handleNavigateToNewIncident = (incident: Incident) => {
+    // Navegar al detalle de la incidencia recién creada
+    handleViewIncident(incident);
   };
 
   const handleUpdateIncident = async (incident: Incident) => {
@@ -706,7 +714,20 @@ function App() {
         </main>
       ) : activeTab === 'new-incident' ? (
         <main className="app-main page-transition-enter">
-          <IncidentForm onAdd={handleAddIncident} />
+          <IncidentForm 
+            onAdd={handleAddIncident}
+            onNavigateToDetail={
+              (() => {
+                try {
+                  const saved = localStorage.getItem('app_general_settings');
+                  const settings = saved ? JSON.parse(saved) : {};
+                  return settings.navigateToDetailAfterCreate ? handleNavigateToNewIncident : undefined;
+                } catch {
+                  return undefined;
+                }
+              })()
+            }
+          />
         </main>
       ) : activeTab === 'incident-detail' && selectedIncident ? (
         <main className="incident-detail-main">
