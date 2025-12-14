@@ -191,9 +191,7 @@ export function UserManagement({ currentUser }: UserManagementProps) {
   return (
     <div className="user-management">
       <div className="settings-header">
-        <div>
-          <h2>👥 Gestión de Usuarios</h2>
-        </div>
+        <h2>👥 Usuarios</h2>
         {!showCreateForm && (
           <button 
             className="btn-create-user"
