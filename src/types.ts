@@ -118,8 +118,8 @@ export interface Tag {
   color: string;
 }
 
-export type AutomationTrigger = 'on-create' | 'on-status-change' | 'on-priority-change' | 'on-time-threshold';
-export type AutomationAction = 'set-priority' | 'set-status' | 'add-tag' | 'assign-to';
+export type AutomationTrigger = 'on-create' | 'on-status-change' | 'on-priority-change' | 'on-time-threshold' | 'on-type-change' | 'on-tag-added';
+export type AutomationAction = 'set-priority' | 'set-status' | 'add-tag' | 'assign-to' | 'show-notification' | 'send-alert';
 
 export interface AutomationRule {
   id: string;
@@ -129,17 +129,19 @@ export interface AutomationRule {
   conditions: AutomationCondition[];
   actions: AutomationRuleAction[];
   createdAt: string;
+  description?: string;
 }
 
 export interface AutomationCondition {
-  field: 'type' | 'priority' | 'status' | 'days-open' | 'has-tag';
-  operator: 'equals' | 'not-equals' | 'greater-than' | 'less-than' | 'contains';
+  field: 'type' | 'priority' | 'status' | 'days-open' | 'has-tag' | 'title-contains' | 'description-contains';
+  operator: 'equals' | 'not-equals' | 'greater-than' | 'less-than' | 'contains' | 'not-contains';
   value: string | number;
 }
 
 export interface AutomationRuleAction {
   type: AutomationAction;
   value: string;
+  message?: string; // Para notificaciones y alertas personalizadas
 }
 
 export type ReportType = 'error' | 'mejora';

@@ -18,7 +18,7 @@ export function TagsManager({
   onRemoveTag,
   onDeleteTagGlobally
 }: TagsManagerProps) {
-  const [showInput, setShowInput] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; tag: string | null }>({ 
@@ -31,7 +31,7 @@ export function TagsManager({
     if (newTag.trim()) {
       onAddTag(incidentId, newTag.trim());
       setNewTag('');
-      setShowInput(false);
+      setShowModal(false);
       setShowSuggestions(false);
     }
   };
@@ -65,53 +65,63 @@ export function TagsManager({
       <div className="tags-header">
         <h4>🏷️ Etiquetas</h4>
         <div className="tags-actions">
-          {!showInput && (
-            <>
-              <button 
-                className="btn-add-tag"
-                onClick={() => setShowInput(true)}
-              >
-                + Nueva
-              </button>
-              {allSystemTags.length > 0 && (
-                <button 
-                  className="btn-suggest-tag"
-                  onClick={() => {
-                    console.log('Toggling suggestions. Current:', showSuggestions);
-                    console.log('Available tags:', allSystemTags);
-                    setShowSuggestions(!showSuggestions);
-                  }}
-                >
-                  📋 Gestionar
-                </button>
-              )}
-            </>
+          <button 
+            className="btn-add-tag"
+            onClick={() => setShowModal(true)}
+          >
+            + Nueva
+          </button>
+          {allSystemTags.length > 0 && (
+            <button 
+              className="btn-suggest-tag"
+              onClick={() => {
+                console.log('Toggling suggestions. Current:', showSuggestions);
+                console.log('Available tags:', allSystemTags);
+                setShowSuggestions(!showSuggestions);
+              }}
+            >
+              📋 Gestionar
+            </button>
           )}
         </div>
       </div>
 
-      {showInput && (
-        <form className="tag-input-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Escribe una etiqueta..."
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-            autoFocus
-            className="tag-input"
-          />
-          <button type="submit" className="btn-submit-tag">✓</button>
-          <button 
-            type="button" 
-            className="btn-cancel-tag"
-            onClick={() => {
-              setShowInput(false);
-              setNewTag('');
-            }}
-          >
-            ✕
-          </button>
-        </form>
+      {showModal && (
+        <div className="tag-modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="tag-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="tag-modal-header">
+              <h3>🏷️ Nueva Etiqueta</h3>
+              <button className="btn-close-modal" onClick={() => setShowModal(false)}>✕</button>
+            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="tag-modal-body">
+                <input
+                  type="text"
+                  placeholder="Nombre de la etiqueta..."
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  autoFocus
+                  className="tag-modal-input"
+                />
+              </div>
+              <div className="tag-modal-actions">
+                <button 
+                  type="button" 
+                  className="btn-cancel"
+                  onClick={() => {
+                    setShowModal(false);
+                    setNewTag('');
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-submit">
+                  ✓ Crear
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {showSuggestions && allSystemTags.length > 0 && (

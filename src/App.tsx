@@ -8,7 +8,6 @@ import { ReportModal } from './components/ReportModal';
 import { ReportsManagement } from './components/ReportsManagement';
 import { IncidentList } from './components/IncidentList';
 import { IncidentEdit } from './components/IncidentEdit';
-import { IncidentChart } from './components/IncidentChart';
 import { IncidentStats } from './components/IncidentStats';
 import { QuickIncidentsList } from './components/QuickIncidentsList';
 import { MetricsDashboard } from './components/MetricsDashboard';
@@ -26,6 +25,7 @@ import { Login } from './components/Login';
 import { UserProfile } from './components/UserProfile';
 import RoleManagement from './components/RoleManagement';
 import MobileMenu from './components/MobileMenu';
+import { SessionSettings } from './components/SessionSettings';
 import QuickSearch from './components/QuickSearch';
 import OnboardingTour from './components/OnboardingTour';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -40,7 +40,7 @@ function App() {
   const [editingIncident, setEditingIncident] = useState<Incident | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'all-incidents' | 'new-incident' | 'incident-detail' | 'settings'>('dashboard');
-  const [settingsSection, setSettingsSection] = useState<'profile' | 'automation' | 'users' | 'roles' | 'appearance' | 'general' | 'reports'>('profile');
+  const [settingsSection, setSettingsSection] = useState<'profile' | 'automation' | 'users' | 'roles' | 'appearance' | 'general' | 'reports' | 'session'>('profile');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [currentTheme, setCurrentTheme] = useState<string>('purple-gradient');
   const [openIncidents, setOpenIncidents] = useState<Incident[]>([]);
@@ -660,22 +660,25 @@ function App() {
         <div className="app-header-actions">
           <div className="user-info">
             <span className="user-name">👤 {currentUser.name}</span>
-            <button className="btn-logout" onClick={handleLogout} title="Cerrar sesión">
-              🚪 {isMobile ? '' : 'Salir'}
-            </button>
           </div>
-          <div className="app-header-badge" onClick={() => setShowAlerts(!showAlerts)}>
+          <button 
+            className="app-header-badge icon-only" 
+            onClick={() => setShowAlerts(!showAlerts)}
+            title="Alertas"
+          >
             <span className="badge-icon">🔔</span>
-            {!isMobile && <span className="badge-text">Alertas</span>}
             {incidents.filter(inc => inc.priority === 'crítica' && inc.status !== 'resuelta' && inc.status !== 'cerrada').length > 0 && (
               <span className="alerts-count">{incidents.filter(inc => inc.priority === 'crítica' && inc.status !== 'resuelta' && inc.status !== 'cerrada').length}</span>
             )}
-          </div>
+          </button>
           {!isMobile && (
-            <div className="app-header-badge" onClick={() => handleTabChange('settings')}>
+            <button 
+              className="app-header-badge icon-only" 
+              onClick={() => handleTabChange('settings')}
+              title="Ajustes"
+            >
               <span className="badge-icon">⚙️</span>
-              <span className="badge-text">Ajustes</span>
-            </div>
+            </button>
           )}
         </div>
       </header>
@@ -750,11 +753,6 @@ function App() {
             </div>
 
             <div className="list-section">
-              <IncidentChart 
-                incidents={incidents} 
-                onStatusClick={setSelectedStatus}
-                onNavigateToList={() => setActiveTab('all-incidents')}
-              />
               <YearlyChart incidents={incidents} />
               <IncidentStats incidents={incidents} />
             </div>
@@ -857,7 +855,13 @@ function App() {
                   onClick={() => setSettingsSection('reports')}
                 >
                   <span className="menu-icon">📋</span>
-                  <span>Reportes</span>
+                  <span>📊 Informes</span>
+                </button>
+                <button
+                  className={`settings-menu-item ${settingsSection === 'session' ? 'active' : ''}`}
+                  onClick={() => setSettingsSection('session')}
+                >
+                  <span>🔐 Sesión</span>
                 </button>
               </div>
             </div>
@@ -899,6 +903,12 @@ function App() {
                   reports={reports}
                   onUpdateReport={handleUpdateReport}
                   onDeleteReport={handleDeleteReport}
+                />
+              ) : settingsSection === 'session' ? (
+                <SessionSettings
+                  currentUser={currentUser!}
+                  onLogout={handleLogout}
+                  onChangeUser={handleLogout}
                 />
               ) : null}
             </div>

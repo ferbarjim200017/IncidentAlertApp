@@ -42,12 +42,6 @@ export const Tabs: React.FC<TabsProps> = ({
       >
         ➕ Nueva Incidencia
       </button>
-      <button
-        className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
-        onClick={() => onTabChange('settings')}
-      >
-        ⚙️ Ajustes
-      </button>
       
       {openIncidents.map((incident) => (
         <div

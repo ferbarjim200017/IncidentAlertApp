@@ -14,12 +14,14 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
   const [editingRule, setEditingRule] = useState<AutomationRule | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    description: '',
     trigger: 'on-create' as AutomationTrigger,
     conditionField: 'type' as any,
     conditionOperator: 'equals' as any,
     conditionValue: '',
     actionType: 'set-priority' as AutomationAction,
     actionValue: '',
+    actionMessage: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -27,6 +29,7 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
     
     const newRule: Omit<AutomationRule, 'id' | 'createdAt'> = {
       name: formData.name,
+      description: formData.description,
       enabled: true,
       trigger: formData.trigger,
       conditions: [{
@@ -37,6 +40,7 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
       actions: [{
         type: formData.actionType,
         value: formData.actionValue,
+        message: formData.actionMessage || undefined,
       }],
     };
 
@@ -53,12 +57,14 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
   const resetForm = () => {
     setFormData({
       name: '',
+      description: '',
       trigger: 'on-create',
       conditionField: 'type',
       conditionOperator: 'equals',
       conditionValue: '',
       actionType: 'set-priority',
       actionValue: '',
+      actionMessage: '',
     });
     setShowForm(false);
   };
@@ -67,12 +73,14 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
     setEditingRule(rule);
     setFormData({
       name: rule.name,
+      description: rule.description || '',
       trigger: rule.trigger,
       conditionField: rule.conditions[0]?.field || 'type',
       conditionOperator: rule.conditions[0]?.operator || 'equals',
       conditionValue: rule.conditions[0]?.value.toString() || '',
       actionType: rule.actions[0]?.type || 'set-priority',
       actionValue: rule.actions[0]?.value || '',
+      actionMessage: rule.actions[0]?.message || '',
     });
     setShowForm(true);
   };
@@ -83,6 +91,8 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
       'on-status-change': 'Al cambiar estado',
       'on-priority-change': 'Al cambiar prioridad',
       'on-time-threshold': 'Por tiempo transcurrido',
+      'on-type-change': 'Al cambiar tipo',
+      'on-tag-added': 'Al añadir etiqueta',
     };
     return labels[trigger];
   };
@@ -115,6 +125,16 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
               />
             </div>
 
+            <div className="form-group">
+              <label>Descripción (opcional)</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Describe qué hace esta regla..."
+                rows={2}
+              />
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label>Disparador</label>
@@ -125,6 +145,8 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
                   <option value="on-create">Al crear incidencia</option>
                   <option value="on-status-change">Al cambiar estado</option>
                   <option value="on-priority-change">Al cambiar prioridad</option>
+                  <option value="on-type-change">Al cambiar tipo</option>
+                  <option value="on-tag-added">Al añadir etiqueta</option>
                   <option value="on-time-threshold">Por tiempo transcurrido</option>
                 </select>
               </div>
@@ -146,6 +168,8 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
                   <option value="status">Estado</option>
                   <option value="days-open">Días abierta</option>
                   <option value="has-tag">Tiene etiqueta</option>
+                  <option value="title-contains">Título contiene</option>
+                  <option value="description-contains">Descripción contiene</option>
                 </select>
               </div>
 
@@ -163,8 +187,11 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
                       <option value="less-than">Menor que</option>
                     </>
                   )}
-                  {formData.conditionField === 'has-tag' && (
-                    <option value="contains">Contiene</option>
+                  {(formData.conditionField === 'has-tag' || formData.conditionField === 'title-contains' || formData.conditionField === 'description-contains') && (
+                    <>
+                      <option value="contains">Contiene</option>
+                      <option value="not-contains">No contiene</option>
+                    </>
                   )}
                 </select>
               </div>
@@ -244,6 +271,8 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
                   <option value="set-status">Cambiar estado</option>
                   <option value="add-tag">Añadir etiqueta</option>
                   <option value="assign-to">Asignar a</option>
+                  <option value="show-notification">Mostrar notificación</option>
+                  <option value="send-alert">Enviar alerta</option>
                 </select>
               </div>
 
@@ -275,6 +304,14 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
                     <option value="resuelta">Resuelta</option>
                     <option value="cerrada">Cerrada</option>
                   </select>
+                ) : formData.actionType === 'show-notification' || formData.actionType === 'send-alert' ? (
+                  <input
+                    type="text"
+                    value={formData.actionValue}
+                    onChange={(e) => setFormData({ ...formData, actionValue: e.target.value })}
+                    placeholder="Título de la notificación/alerta"
+                    required
+                  />
                 ) : (
                   <input
                     type="text"
@@ -286,6 +323,19 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
                 )}
               </div>
             </div>
+
+            {(formData.actionType === 'show-notification' || formData.actionType === 'send-alert') && (
+              <div className="form-group">
+                <label>Mensaje personalizado</label>
+                <textarea
+                  value={formData.actionMessage}
+                  onChange={(e) => setFormData({ ...formData, actionMessage: e.target.value })}
+                  placeholder="Describe el mensaje que se mostrará..."
+                  rows={3}
+                  required
+                />
+              </div>
+            )}
 
             <div className="form-actions">
               <button type="submit" className="btn-save-rule">

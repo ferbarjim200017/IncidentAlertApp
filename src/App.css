@@ -196,6 +196,16 @@
   transform: rotate(180deg);
 }
 
+.app-header-badge.icon-only {
+  padding: 0.8rem;
+  min-width: 48px;
+  justify-content: center;
+}
+
+.app-header-badge.icon-only .badge-icon {
+  margin: 0;
+}
+
 .badge-text {
   font-weight: 700;
   font-size: 0.95rem;
