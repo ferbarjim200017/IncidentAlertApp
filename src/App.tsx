@@ -754,7 +754,11 @@ function App() {
             </div>
 
             <div className="list-section">
-              <IncidentChart incidents={incidents} />
+              <IncidentChart 
+                incidents={incidents}
+                onStatusClick={handleStatusClick}
+                onNavigateToList={() => setActiveTab('all-incidents')}
+              />
               <YearlyChart incidents={incidents} />
               <IncidentStats incidents={incidents} />
             </div>
