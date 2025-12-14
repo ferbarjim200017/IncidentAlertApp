@@ -74,7 +74,7 @@ export function UserProfile({ currentUser, onUpdate }: UserProfileProps) {
   return (
     <div className="user-profile">
       <div className="settings-header">
-        <h2>👤 Mi Perfil</h2>
+        <h2>👤 Perfil</h2>
       </div>
 
       {notification && (

@@ -190,7 +190,7 @@ export function GeneralSettings({ onSettingsChange }: GeneralSettingsProps) {
       )}
 
       <div className="settings-header">
-        <h2>⚙️ Configuración General</h2>
+        <h2>⚙️ General</h2>
       </div>
 
       <div className="settings-sections">

@@ -26,7 +26,6 @@ import { Login } from './components/Login';
 import { UserProfile } from './components/UserProfile';
 import RoleManagement from './components/RoleManagement';
 import MobileMenu from './components/MobileMenu';
-import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp';
 import QuickSearch from './components/QuickSearch';
 import OnboardingTour from './components/OnboardingTour';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -49,7 +48,6 @@ function App() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [showQuickSearch, setShowQuickSearch] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -957,12 +955,6 @@ function App() {
           userName={currentUser.name}
         />
       )}
-
-      {/* Keyboard Shortcuts Help */}
-      <KeyboardShortcutsHelp
-        isOpen={showKeyboardHelp}
-        onClose={() => setShowKeyboardHelp(false)}
-      />
 
       {/* Quick Search (Ctrl+K) */}
       <QuickSearch

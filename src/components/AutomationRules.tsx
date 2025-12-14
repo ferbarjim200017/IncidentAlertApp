@@ -90,9 +90,7 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
   return (
     <div className="automation-rules-container">
       <div className="settings-header">
-        <div>
-          <h2>⚙️ Reglas de Automatización</h2>
-        </div>
+        <h2>🤖 Automatización</h2>
         <button 
           className="btn-add-rule"
           onClick={() => setShowForm(!showForm)}
@@ -304,8 +302,8 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
       <div className="rules-list">
         {rules.length === 0 ? (
           <div className="no-rules">
-            <p>📋 No hay reglas de automatización configuradas</p>
-            <p className="no-rules-hint">Crea tu primera regla para automatizar acciones en tus incidencias</p>
+            <p>📋 No hay reglas configuradas</p>
+            <p className="no-rules-hint">Crea tu primera regla para automatizar acciones</p>
           </div>
         ) : (
           rules.map(rule => (

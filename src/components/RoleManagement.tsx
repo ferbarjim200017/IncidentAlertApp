@@ -191,9 +191,7 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ currentUser }) => {
   return (
     <div className="role-management">
       <div className="settings-header">
-        <div>
-          <h2>🔐 Gestión de Roles</h2>
-        </div>
+        <h2>🔐 Roles</h2>
         <button className="btn-create-role" onClick={() => handleOpenModal()}>
           + Crear Rol
         </button>
