@@ -638,6 +638,11 @@ function App() {
     setActiveTab('dashboard');
   };
 
+  const handleStatusClick = (status: string) => {
+    setSelectedStatus(status);
+    setActiveTab('all-incidents');
+  };
+
   // Si no hay usuario autenticado, mostrar login
   if (!currentUser) {
     return <Login onLogin={handleLogin} />;
