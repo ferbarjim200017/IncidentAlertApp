@@ -166,7 +166,7 @@ function App() {
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
-    enabled: currentUser !== null && !showKeyboardHelp,
+    enabled: currentUser !== null,
     shortcuts: [
       {
         key: 'k',
@@ -193,16 +193,9 @@ function App() {
         description: 'Editar incidencia'
       },
       {
-        key: '?',
-        shift: true,
-        callback: () => setShowKeyboardHelp(true),
-        description: 'Mostrar ayuda'
-      },
-      {
         key: 'Escape',
         callback: () => {
           if (showQuickSearch) setShowQuickSearch(false);
-          if (showKeyboardHelp) setShowKeyboardHelp(false);
           if (editingIncident) setEditingIncident(null);
         },
         description: 'Cerrar modal'
@@ -665,14 +658,6 @@ function App() {
           <Logo />
         </div>
         <div className="app-header-actions">
-          <button 
-            className="app-header-badge keyboard-shortcut-trigger"
-            onClick={() => setShowKeyboardHelp(true)}
-            title="Atajos de teclado (Shift + ?)"
-          >
-            <span className="badge-icon">⌨️</span>
-            {!isMobile && <span className="badge-text">Atajos</span>}
-          </button>
           <div className="user-info">
             <span className="user-name">👤 {currentUser.name}</span>
             <button className="btn-logout" onClick={handleLogout} title="Cerrar sesión">
