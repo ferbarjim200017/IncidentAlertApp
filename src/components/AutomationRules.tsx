@@ -92,7 +92,6 @@ export function AutomationRules({ rules = [], onAddRule, onUpdateRule, onDeleteR
       <div className="settings-header">
         <div>
           <h2>⚙️ Reglas de Automatización</h2>
-          <p className="settings-description">Automatiza acciones basadas en condiciones</p>
         </div>
         <button 
           className="btn-add-rule"

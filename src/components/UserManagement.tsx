@@ -193,7 +193,6 @@ export function UserManagement({ currentUser }: UserManagementProps) {
       <div className="settings-header">
         <div>
           <h2>👥 Gestión de Usuarios</h2>
-          <p className="settings-description">Administra los usuarios del sistema</p>
         </div>
         {!showCreateForm && (
           <button 

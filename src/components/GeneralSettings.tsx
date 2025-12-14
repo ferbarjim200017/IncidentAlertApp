@@ -191,7 +191,6 @@ export function GeneralSettings({ onSettingsChange }: GeneralSettingsProps) {
 
       <div className="settings-header">
         <h2>⚙️ Configuración General</h2>
-        <p className="settings-description">Ajusta el comportamiento de la aplicación</p>
       </div>
 
       <div className="settings-sections">

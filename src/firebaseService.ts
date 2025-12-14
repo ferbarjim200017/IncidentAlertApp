@@ -386,9 +386,43 @@ export const migrateUsersToRoleId = async () => {
       await Promise.all(updates);
       console.log(`✅ Migración completada: ${migratedCount} usuarios actualizados al nuevo sistema de roles`);
     } else {
-      console.log('✅ Todos los usuarios ya tienen roleId asignado');
-    }
+    console.log('✅ Todos los usuarios ya tienen roleId asignado');
+  }
   } catch (error) {
     console.error('❌ Error en migración de usuarios:', error);
   }
+};
+
+// ============ REPORTS ============
+export const getReports = async (): Promise<any[]> => {
+  const querySnapshot = await getDocs(collection(db, 'reports'));
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+export const addReport = async (report: any): Promise<string> => {
+  const docRef = await addDoc(collection(db, 'reports'), {
+    ...report,
+    createdAt: new Date().toISOString()
+  });
+  return docRef.id;
+};
+
+export const updateReport = async (id: string, updates: any): Promise<void> => {
+  const docRef = doc(db, 'reports', id);
+  await updateDoc(docRef, updates);
+};
+
+export const deleteReport = async (id: string): Promise<void> => {
+  await deleteDoc(doc(db, 'reports', id));
+};
+
+export const subscribeToReports = (callback: (reports: any[]) => void) => {
+  const q = collection(db, 'reports');
+  return onSnapshot(q, (snapshot) => {
+    const reports = snapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
+    }));
+    callback(reports);
+  });
 };

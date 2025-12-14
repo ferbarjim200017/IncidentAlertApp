@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Incident, AutomationRule, User } from './types';
+import { Incident, AutomationRule, User, Report } from './types';
 import { storageUtils } from './storageUtils';
 import { authUtils } from './authUtils';
 import * as firebaseService from './firebaseService';
 import { IncidentForm } from './components/IncidentForm';
+import { ReportModal } from './components/ReportModal';
+import { ReportsManagement } from './components/ReportsManagement';
 import { IncidentList } from './components/IncidentList';
 import { IncidentEdit } from './components/IncidentEdit';
 import { IncidentChart } from './components/IncidentChart';
@@ -39,7 +41,7 @@ function App() {
   const [editingIncident, setEditingIncident] = useState<Incident | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'all-incidents' | 'new-incident' | 'incident-detail' | 'settings'>('dashboard');
-  const [settingsSection, setSettingsSection] = useState<'profile' | 'automation' | 'users' | 'roles' | 'appearance' | 'general'>('profile');
+  const [settingsSection, setSettingsSection] = useState<'profile' | 'automation' | 'users' | 'roles' | 'appearance' | 'general' | 'reports'>('profile');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [currentTheme, setCurrentTheme] = useState<string>('purple-gradient');
   const [openIncidents, setOpenIncidents] = useState<Incident[]>([]);
@@ -51,6 +53,8 @@ function App() {
   const [showQuickSearch, setShowQuickSearch] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   // Filtrar incidencias del usuario actual
   const incidents = currentUser ? allIncidents.filter(inc => inc.userId === currentUser.id) : [];
@@ -226,6 +230,19 @@ function App() {
         setTimeout(() => setShowOnboarding(true), 1000);
       }
     }
+  }, [currentUser]);
+
+  // Suscribirse a reportes en tiempo real
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const unsubscribe = firebaseService.subscribeToReports((updatedReports) => {
+      setReports(updatedReports);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, [currentUser]);
 
   // Cargar rol del usuario cuando cambie el currentUser
@@ -533,6 +550,54 @@ function App() {
     }
   };
 
+  const handleAddReport = async (report: Omit<Report, 'id' | 'createdAt'>) => {
+    try {
+      await firebaseService.addReport(report);
+      setNotification({
+        type: 'success',
+        message: '✓ Reporte creado correctamente',
+      });
+    } catch (error) {
+      console.error('Error adding report:', error);
+      setNotification({
+        type: 'error',
+        message: 'Error al crear el reporte',
+      });
+    }
+  };
+
+  const handleUpdateReport = async (reportId: string, updates: Partial<Report>) => {
+    try {
+      await firebaseService.updateReport(reportId, updates);
+      setNotification({
+        type: 'success',
+        message: '✓ Reporte actualizado',
+      });
+    } catch (error) {
+      console.error('Error updating report:', error);
+      setNotification({
+        type: 'error',
+        message: 'Error al actualizar el reporte',
+      });
+    }
+  };
+
+  const handleDeleteReport = async (reportId: string) => {
+    try {
+      await firebaseService.deleteReport(reportId);
+      setNotification({
+        type: 'success',
+        message: '✓ Reporte eliminado',
+      });
+    } catch (error) {
+      console.error('Error deleting report:', error);
+      setNotification({
+        type: 'error',
+        message: 'Error al eliminar el reporte',
+      });
+    }
+  };
+
   const handleDeleteAutomationRule = async (ruleId: string) => {
     try {
       await firebaseService.deleteAutomationRule(ruleId);
@@ -804,9 +869,17 @@ function App() {
                   <span className="menu-icon">🔧</span>
                   <span>General</span>
                 </button>
+                <button
+                  className={`settings-menu-item ${settingsSection === 'reports' ? 'active' : ''}`}
+                  onClick={() => setSettingsSection('reports')}
+                >
+                  <span className="menu-icon">📋</span>
+                  <span>Reportes</span>
+                </button>
               </div>
             </div>
             <div className="settings-content">
+              {settingsSection === 'profile' ? (
               {settingsSection === 'profile' ? (
                 <UserProfile 
                   currentUser={currentUser!} 
@@ -838,6 +911,13 @@ function App() {
                 />
               ) : settingsSection === 'general' ? (
                 <GeneralSettings />
+              ) : settingsSection === 'reports' ? (
+                <ReportsManagement
+                  currentUser={currentUser!}
+                  reports={reports}
+                  onUpdateReport={handleUpdateReport}
+                  onDeleteReport={handleDeleteReport}
+                />
               ) : null}
             </div>
           </div>
@@ -899,6 +979,25 @@ function App() {
         onComplete={handleOnboardingComplete}
         onSkip={handleOnboardingComplete}
       />
+
+      {/* Botón flotante para crear reporte */}
+      <button 
+        className="floating-report-button"
+        onClick={() => setShowReportModal(true)}
+        title="Crear reporte"
+      >
+        📝
+      </button>
+
+      {/* Modal de crear reporte */}
+      {showReportModal && (
+        <ReportModal
+          onClose={() => setShowReportModal(false)}
+          onSubmit={handleAddReport}
+          userName={currentUser!.name}
+          userId={currentUser!.id}
+        />
+      )}
     </div>
   );
 }

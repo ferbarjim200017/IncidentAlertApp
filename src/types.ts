@@ -141,3 +141,18 @@ export interface AutomationRuleAction {
   type: AutomationAction;
   value: string;
 }
+
+export type ReportType = 'error' | 'mejora';
+export type ReportStatus = 'abierto' | 'completado';
+
+export interface Report {
+  id: string;
+  userName: string;
+  userId: string;
+  title: string;
+  description: string;
+  type: ReportType;
+  status: ReportStatus;
+  createdAt: string;
+  updatedAt?: string;
+}
