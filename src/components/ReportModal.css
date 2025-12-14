@@ -74,6 +74,8 @@
   font-size: 1rem;
   font-family: inherit;
   transition: all 0.2s;
+  background: white;
+  color: #2d3748;
 }
 
 .report-form-group input:focus,
@@ -105,8 +107,9 @@
   border: 2px solid #e2e8f0;
   border-radius: 10px;
   background: white;
+  color: #4a5568;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -118,6 +121,7 @@
 .type-option:hover {
   border-color: #cbd5e0;
   transform: translateY(-2px);
+  background: #f7fafc;
 }
 
 .type-option.selected {
@@ -128,10 +132,12 @@
 
 .type-option.selected.error {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
 }
 
 .type-option.selected.mejora {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
 }
 
 .report-modal-actions {

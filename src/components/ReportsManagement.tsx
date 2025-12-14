@@ -81,20 +81,50 @@ export function ReportsManagement({ currentUser, reports, onUpdateReport, onDele
       <div className="reports-filters">
         <div className="filter-group">
           <label>Tipo:</label>
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value as any)}>
-            <option value="all">Todos</option>
-            <option value="error">🐛 Errores</option>
-            <option value="mejora">💡 Mejoras</option>
-          </select>
+          <div className="filter-buttons">
+            <button
+              className={`filter-btn ${filterType === 'all' ? 'active' : ''}`}
+              onClick={() => setFilterType('all')}
+            >
+              Todos
+            </button>
+            <button
+              className={`filter-btn error ${filterType === 'error' ? 'active' : ''}`}
+              onClick={() => setFilterType('error')}
+            >
+              🐛 Errores
+            </button>
+            <button
+              className={`filter-btn mejora ${filterType === 'mejora' ? 'active' : ''}`}
+              onClick={() => setFilterType('mejora')}
+            >
+              💡 Mejoras
+            </button>
+          </div>
         </div>
 
         <div className="filter-group">
           <label>Estado:</label>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)}>
-            <option value="all">Todos</option>
-            <option value="abierto">Abiertos</option>
-            <option value="completado">Completados</option>
-          </select>
+          <div className="filter-buttons">
+            <button
+              className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
+              onClick={() => setFilterStatus('all')}
+            >
+              Todos
+            </button>
+            <button
+              className={`filter-btn ${filterStatus === 'abierto' ? 'active' : ''}`}
+              onClick={() => setFilterStatus('abierto')}
+            >
+              Abiertos
+            </button>
+            <button
+              className={`filter-btn ${filterStatus === 'completado' ? 'active' : ''}`}
+              onClick={() => setFilterStatus('completado')}
+            >
+              Completados
+            </button>
+          </div>
         </div>
 
         <div className="reports-count">
