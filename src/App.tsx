@@ -880,7 +880,6 @@ function App() {
             </div>
             <div className="settings-content">
               {settingsSection === 'profile' ? (
-              {settingsSection === 'profile' ? (
                 <UserProfile 
                   currentUser={currentUser!} 
                   onUpdate={async () => {
