@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Report } from '../types';
-import './ReportDetailModal.css';
+import './ReportModal.css';
 
 interface ReportDetailModalProps {
   report: Report;
@@ -18,89 +18,111 @@ export function ReportDetailModal({ report, onClose }: ReportDetailModalProps) {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  const getTypeLabel = (type: string) => {
-    return type === 'error' ? '🐛 Error' : '💡 Mejora';
-  };
-
-  const getStatusLabel = (status: string) => {
-    return status === 'abierto' ? 'Abierto' : 'Completado';
-  };
-
   return (
-    <div className="report-detail-overlay" onClick={onClose}>
-      <div className="report-detail-content" onClick={(e) => e.stopPropagation()}>
-        <div className="report-detail-header">
+    <div className="report-modal-overlay" onClick={onClose}>
+      <div className="report-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="report-modal-header">
           <h2>📋 Detalle del Reporte</h2>
           <button className="btn-close-modal" onClick={onClose}>✕</button>
         </div>
 
-        <div className="report-detail-body">
-          <div className="detail-section">
+        <div style={{ padding: '2rem' }}>
+          <div className="report-form-group">
             <label>Usuario</label>
-            <div className="detail-value disabled">{report.userName}</div>
+            <input type="text" value={report.userName} disabled className="input-disabled" />
           </div>
 
-          <div className="detail-section">
+          <div className="report-form-group">
             <label>Título</label>
-            <div className="detail-value">{report.title}</div>
+            <input
+              type="text"
+              value={report.title}
+              disabled
+              className="input-disabled"
+            />
           </div>
 
-          <div className="detail-section">
+          <div className="report-form-group">
             <label>Descripción</label>
-            <div className="detail-value description">{report.description}</div>
+            <textarea
+              value={report.description}
+              disabled
+              className="input-disabled"
+              rows={6}
+            />
           </div>
 
-          <div className="detail-row">
-            <div className="detail-section">
-              <label>Tipo</label>
-              <div className={`detail-badge type-${report.type}`}>
-                {getTypeLabel(report.type)}
-              </div>
-            </div>
-
-            <div className="detail-section">
-              <label>Estado</label>
-              <div className={`detail-badge status-${report.status}`}>
-                {getStatusLabel(report.status)}
-              </div>
+          <div className="report-form-group">
+            <label>Tipo</label>
+            <div className="report-type-selector">
+              <button
+                type="button"
+                className={`type-option ${report.type === 'error' ? 'selected error' : ''}`}
+                disabled
+                style={{ cursor: 'not-allowed', opacity: '0.7' }}
+              >
+                🐛 Error
+              </button>
+              <button
+                type="button"
+                className={`type-option ${report.type === 'mejora' ? 'selected mejora' : ''}`}
+                disabled
+                style={{ cursor: 'not-allowed', opacity: '0.7' }}
+              >
+                💡 Mejora
+              </button>
             </div>
           </div>
 
-          <div className="detail-row">
-            <div className="detail-section">
-              <label>Fecha de Creación</label>
-              <div className="detail-value">
-                {new Date(report.createdAt).toLocaleDateString('es-ES', {
+          <div className="report-form-group">
+            <label>Estado</label>
+            <input
+              type="text"
+              value={report.status === 'abierto' ? 'Abierto' : 'Completado'}
+              disabled
+              className="input-disabled"
+            />
+          </div>
+
+          <div className="report-form-group">
+            <label>Fecha de Creación</label>
+            <input
+              type="text"
+              value={new Date(report.createdAt).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+              disabled
+              className="input-disabled"
+            />
+          </div>
+
+          {report.updatedAt && report.status === 'completado' && (
+            <div className="report-form-group">
+              <label>Fecha de Completado</label>
+              <input
+                type="text"
+                value={new Date(report.updatedAt).toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric',
                   hour: '2-digit',
                   minute: '2-digit'
                 })}
-              </div>
+                disabled
+                className="input-disabled"
+              />
             </div>
+          )}
 
-            {report.updatedAt && report.status === 'completado' && (
-              <div className="detail-section">
-                <label>Fecha de Completado</label>
-                <div className="detail-value">
-                  {new Date(report.updatedAt).toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </div>
-              </div>
-            )}
+          <div className="report-modal-actions">
+            <button type="button" className="btn-cancel" onClick={onClose}>
+              Cerrar
+            </button>
           </div>
-        </div>
-
-        <div className="report-detail-footer">
-          <button className="btn-close" onClick={onClose}>
-            Cerrar
-          </button>
         </div>
       </div>
     </div>
