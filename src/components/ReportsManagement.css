@@ -7,13 +7,16 @@
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  display: block;
 }
 
 .settings-header h2 {
   font-size: 2rem;
-  margin: 0 0 0 0;
+  margin: 0;
+  padding: 0;
   color: #2d3748;
   font-weight: 700;
+  line-height: 1;
 }
 
 .reports-filters {
@@ -106,11 +109,12 @@
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .report-card:hover {
-  border-color: #cbd5e0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
   transform: translateY(-2px);
 }
 
@@ -213,18 +217,6 @@
 .btn-delete-report:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.report-body {
-  margin-bottom: 1rem;
-}
-
-.report-description {
-  color: #4a5568;
-  line-height: 1.6;
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
 .report-footer {

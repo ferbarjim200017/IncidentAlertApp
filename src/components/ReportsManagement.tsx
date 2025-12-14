@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Report, User, Role } from '../types';
 import * as firebaseService from '../firebaseService';
+import { ReportDetailModal } from './ReportDetailModal';
 import './ReportsManagement.css';
 
 interface ReportsManagementProps {
@@ -15,6 +16,7 @@ export function ReportsManagement({ currentUser, reports, onUpdateReport, onDele
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
   const [filterType, setFilterType] = useState<'all' | 'error' | 'mejora'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'abierto' | 'completado'>('all');
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
   useEffect(() => {
     const loadRole = async () => {
@@ -139,13 +141,13 @@ export function ReportsManagement({ currentUser, reports, onUpdateReport, onDele
       ) : (
         <div className="reports-list">
           {filteredReports.map((report) => (
-            <div key={report.id} className="report-card">
+            <div key={report.id} className="report-card" onClick={() => setSelectedReport(report)}>
               <div className="report-header">
                 <div className="report-title-section">
                   <span className="report-type-icon">{getTypeIcon(report.type)}</span>
                   <h3>{report.title}</h3>
                 </div>
-                <div className="report-actions">
+                <div className="report-actions" onClick={(e) => e.stopPropagation()}>
                   {getStatusBadge(report.status)}
                   {isAdmin && (
                     <>
@@ -178,10 +180,6 @@ export function ReportsManagement({ currentUser, reports, onUpdateReport, onDele
                 </div>
               </div>
 
-              <div className="report-body">
-                <p className="report-description">{report.description}</p>
-              </div>
-
               <div className="report-footer">
                 <div className="report-meta">
                   <span className="report-user">👤 {report.userName}</span>
@@ -208,6 +206,13 @@ export function ReportsManagement({ currentUser, reports, onUpdateReport, onDele
             </div>
           ))}
         </div>
+      )}
+
+      {selectedReport && (
+        <ReportDetailModal
+          report={selectedReport}
+          onClose={() => setSelectedReport(null)}
+        />
       )}
     </div>
   );
