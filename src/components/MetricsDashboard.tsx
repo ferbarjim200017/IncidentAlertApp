@@ -22,15 +22,6 @@ export function MetricsDashboard({ incidents }: MetricsDashboardProps) {
     return Math.round(totalDays / closedIncidents.length);
   };
 
-  // Contar incidencias por tipo
-  const getIncidentsByType = () => {
-    return {
-      correctivo: incidents.filter(inc => inc.type === 'correctivo').length,
-      evolutivo: incidents.filter(inc => inc.type === 'evolutivo').length,
-      tarea: incidents.filter(inc => inc.type === 'tarea').length,
-    };
-  };
-
   // Incidencias del mes actual
   const getThisMonthIncidents = () => {
     const now = new Date();
@@ -57,7 +48,6 @@ export function MetricsDashboard({ incidents }: MetricsDashboardProps) {
   };
 
   const avgResolutionTime = calculateAverageResolutionTime();
-  const typeStats = getIncidentsByType();
   const thisMonthCount = getThisMonthIncidents();
   const resolutionRate = getResolutionRate();
   const criticalPending = getCriticalPending();
@@ -96,24 +86,6 @@ export function MetricsDashboard({ incidents }: MetricsDashboardProps) {
           <div className="metric-content">
             <div className="metric-value">{criticalPending}</div>
             <div className="metric-label">Críticas/Altas pendientes</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="metrics-detail">
-        <h3>Distribución por Tipo</h3>
-        <div className="type-stats">
-          <div className="type-stat-item">
-            <span className="type-stat-label">🔧 Correctivo</span>
-            <span className="type-stat-value">{typeStats.correctivo}</span>
-          </div>
-          <div className="type-stat-item">
-            <span className="type-stat-label">🚀 Evolutivo</span>
-            <span className="type-stat-value">{typeStats.evolutivo}</span>
-          </div>
-          <div className="type-stat-item">
-            <span className="type-stat-label">📋 Tarea</span>
-            <span className="type-stat-value">{typeStats.tarea}</span>
           </div>
         </div>
       </div>

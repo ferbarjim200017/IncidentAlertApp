@@ -11,6 +11,7 @@ import { IncidentEdit } from './components/IncidentEdit';
 import { IncidentStats } from './components/IncidentStats';
 import { QuickIncidentsList } from './components/QuickIncidentsList';
 import { MetricsDashboard } from './components/MetricsDashboard';
+import { IncidentChart } from './components/IncidentChart';
 import { YearlyChart } from './components/YearlyChart';
 import { AlertsBanner } from './components/AlertsBanner';
 import { Logo } from './components/Logo';
@@ -753,6 +754,7 @@ function App() {
             </div>
 
             <div className="list-section">
+              <IncidentChart incidents={incidents} />
               <YearlyChart incidents={incidents} />
               <IncidentStats incidents={incidents} />
             </div>
