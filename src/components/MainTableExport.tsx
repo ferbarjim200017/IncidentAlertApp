@@ -142,12 +142,20 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
       }
       
       // Fallback: usar mailto con un elemento <a> temporal
+      console.log('Abriendo Outlook PROD:', `mailto:${to}?subject=${subject}`);
       const mailtoLink = document.createElement('a');
       mailtoLink.href = `mailto:${to}?subject=${subject}`;
+      mailtoLink.target = '_blank';
       mailtoLink.style.display = 'none';
       document.body.appendChild(mailtoLink);
-      mailtoLink.click();
-      document.body.removeChild(mailtoLink);
+      
+      // Usar setTimeout para asegurar que el navegador procesa el clic
+      setTimeout(() => {
+        mailtoLink.click();
+        setTimeout(() => {
+          document.body.removeChild(mailtoLink);
+        }, 100);
+      }, 0);
       
       alert('✓ Tabla copiada al portapapeles.\n\nOutlook se abrirá con el correo preparado.\nPega la tabla con Ctrl+V en el cuerpo del correo.');
     } catch (error) {
