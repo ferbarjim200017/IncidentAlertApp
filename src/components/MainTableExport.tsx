@@ -32,9 +32,13 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
   };
 
   const copyTableToClipboard = async () => {
+    console.log('MainTableExport: copyTableToClipboard ejecutándose...');
     try {
       const table = document.querySelector('.main-table');
-      if (!table) return;
+      if (!table) {
+        console.error('MainTableExport: No se encontró la tabla .main-table');
+        return;
+      }
 
       const tempDiv = document.createElement('div');
       
@@ -119,43 +123,29 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
 
       document.body.removeChild(tempDiv);
 
+      console.log('MainTableExport: Tabla copiada, ahora abriendo Outlook...');
+
       // Abrir Outlook usando mailto
       const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
       const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
+      const mailtoUrl = `mailto:${to}?subject=${subject}`;
       
-      // Intentar abrir con la API de Electron primero
-      if ((window as any).electronAPI) {
-        try {
-          const result = await (window as any).electronAPI.openOutlook({
-            to: to,
-            subject: '[Repsol EyG] PR to PROD',
-            htmlBody: htmlContent
-          });
-          
-          if (result.success) {
-            alert('✓ Correo abierto en Outlook con la tabla incluida.');
-            return;
-          }
-        } catch (e) {
-          console.log('Electron API no disponible, usando mailto');
-        }
-      }
+      console.log('MainTableExport: mailto URL:', mailtoUrl);
       
-      // Fallback: usar mailto con un elemento <a> temporal
-      console.log('Abriendo Outlook PROD:', `mailto:${to}?subject=${subject}`);
+      // Crear y hacer clic en el enlace mailto
       const mailtoLink = document.createElement('a');
-      mailtoLink.href = `mailto:${to}?subject=${subject}`;
+      mailtoLink.href = mailtoUrl;
       mailtoLink.target = '_blank';
-      mailtoLink.style.display = 'none';
       document.body.appendChild(mailtoLink);
       
-      // Usar setTimeout para asegurar que el navegador procesa el clic
+      console.log('MainTableExport: Haciendo clic en el enlace mailto...');
+      mailtoLink.click();
+      
+      // Limpiar
       setTimeout(() => {
-        mailtoLink.click();
-        setTimeout(() => {
-          document.body.removeChild(mailtoLink);
-        }, 100);
-      }, 0);
+        document.body.removeChild(mailtoLink);
+        console.log('MainTableExport: Enlace mailto eliminado');
+      }, 500);
       
       alert('✓ Tabla copiada al portapapeles.\n\nOutlook se abrirá con el correo preparado.\nPega la tabla con Ctrl+V en el cuerpo del correo.');
     } catch (error) {
