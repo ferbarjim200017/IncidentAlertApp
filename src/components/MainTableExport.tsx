@@ -93,11 +93,11 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
       textAfter.textContent = 'Gracias, un saludo!';
       tempDiv.appendChild(textAfter);
 
+      const htmlContent = tempDiv.innerHTML;
       document.body.appendChild(tempDiv);
 
       // Copiar como HTML usando Clipboard API
       try {
-        const htmlContent = tempDiv.innerHTML;
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const clipboardItem = new ClipboardItem({
           'text/html': blob,
@@ -117,7 +117,6 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
         }
       }
 
-      const htmlContent = tempDiv.innerHTML;
       document.body.removeChild(tempDiv);
 
       // Intentar abrir Outlook con la API de Electron
