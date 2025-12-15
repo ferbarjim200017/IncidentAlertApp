@@ -104,7 +104,7 @@ export function ExcelExport({ incident, currentUser }: ExcelExportProps) {
 
       // Configurar mailto
       const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
-      const to = encodeURIComponent('DL_DIGITALIZACION_PRODUCCION@REPSOL.COM');
+      const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
       const mailtoUrl = `mailto:${to}?subject=${subject}`;
 
       console.log('ExcelExport: Mailto URL:', mailtoUrl);
@@ -113,7 +113,7 @@ export function ExcelExport({ incident, currentUser }: ExcelExportProps) {
       if (typeof window !== 'undefined' && (window as any).electronAPI?.openOutlook) {
         console.log('ExcelExport: Usando Electron API...');
         (window as any).electronAPI.openOutlook({
-          to: 'DL_DIGITALIZACION_PRODUCCION@REPSOL.COM',
+          to: to,
           subject: '[Repsol EyG] PR to PROD',
           body: htmlContent
         });
