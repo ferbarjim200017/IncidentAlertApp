@@ -15,6 +15,7 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({ onAdd, onNavigateToD
   const [relevante, setRelevante] = useState('');
   const [realizado, setRealizado] = useState('');
   const [clasesModificadas, setClasesModificadas] = useState('');
+  const [externalLink, setExternalLink] = useState('');
   const [creationDate, setCreationDate] = useState(new Date().toISOString().split('T')[0]);
   const [status, setStatus] = useState<IncidentStatus>('abierta');
   const [priority, setPriority] = useState<IncidentPriority>('media');
@@ -36,6 +37,7 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({ onAdd, onNavigateToD
       relevante: relevante.trim(),
       realizado: realizado.trim(),
       clasesModificadas: clasesModificadas.trim(),
+      externalLink: externalLink.trim(),
       prQA2: '',
       prMain: '',
       creationDate: creationDate,
@@ -63,6 +65,7 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({ onAdd, onNavigateToD
     setRelevante('');
     setRealizado('');
     setClasesModificadas('');
+    setExternalLink('');
     setCreationDate(new Date().toISOString().split('T')[0]);
     setStatus('abierta');
     setPriority('media');
@@ -95,6 +98,18 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({ onAdd, onNavigateToD
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Título para envío a PRO"
+            className="input-large"
+          />
+        </div>
+
+        <div className="form-group-full">
+          <label htmlFor="externalLink">🔗 Enlace Externo (Opcional)</label>
+          <input
+            id="externalLink"
+            type="url"
+            value={externalLink}
+            onChange={(e) => setExternalLink(e.target.value)}
+            placeholder="https://ejemplo.com/recurso"
             className="input-large"
           />
         </div>

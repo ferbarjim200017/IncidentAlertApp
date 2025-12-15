@@ -110,6 +110,7 @@ export interface Incident {
   realizado?: string;
   clasesModificadas?: string;
   timeTracking?: TimeEntry[];
+  externalLink?: string;
 }
 
 export interface Tag {

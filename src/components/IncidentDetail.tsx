@@ -117,7 +117,21 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({
                   <button className="btn-back-inline" onClick={onBack}>
                     ←
                   </button>
-                  <h1>{incident.name}</h1>
+                  {incident.externalLink ? (
+                    <h1>
+                      <a 
+                        href={incident.externalLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="incident-title-link"
+                        title={`Abrir enlace: ${incident.externalLink}`}
+                      >
+                        {incident.name} 🔗
+                      </a>
+                    </h1>
+                  ) : (
+                    <h1>{incident.name}</h1>
+                  )}
                 </div>
                 <ExcelExport incident={incident} currentUser={currentUserName} />
               </div>
