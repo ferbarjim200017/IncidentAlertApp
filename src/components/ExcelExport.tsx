@@ -43,105 +43,93 @@ export function ExcelExport({ incident, currentUser }: ExcelExportProps) {
   };
 
   const copyTableToClipboard = async () => {
+    console.log('ExcelExport: copyTableToClipboard ejecutándose...');
+    
     try {
-      const table = document.querySelector('.excel-table');
-      if (!table) return;
+      // Construir HTML de la tabla con estilos inline
+      const htmlContent = `
+        <html>
+        <body>
+          <p style="margin-bottom: 1rem;">Buenas, os envío una PR para su subida a PRO</p>
+          <table style="width: auto; border-collapse: collapse; font-family: Calibri, sans-serif; font-size: 11pt; white-space: nowrap;">
+            <thead>
+              <tr style="background-color: #fbbf24;">
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">INCIDENCIA/S</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">Estado petición Incidencias</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">DIA DESPLIEGUE</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">PERSONA CONTACTO</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">DESCRIPCIÓN</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">DEPENDENCIAS</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">PR PRO</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">PR QA</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">Desplegado</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">PUESTO EXCEL QA</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">TIPO MOV</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb; font-weight: 700; color: #000; background-color: #fbbf24;">TICKET DEPENDENCIA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">${incident.name}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">Verificado en Test</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">${deploymentDate || '-'}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">${currentUser}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">${incident.title || 'Sin título'}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">NO</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">${getPRNumbers(incident.prMainList)}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">${getPRNumbers(incident.prQA2List)}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">NO</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;"></td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">${getTypeText(incident.type)}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; color: #333; font-weight: 500;">-</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top: 1rem;">Un saludo, Gracias!</p>
+        </body>
+        </html>
+      `;
 
-      // Crear contenedor con texto antes, tabla y texto después
-      const tempDiv = document.createElement('div');
-      
-      // Texto antes
-      const textBefore = document.createElement('p');
-      textBefore.textContent = 'Buenas, os envío una PR para su subida a PRO';
-      textBefore.style.marginBottom = '1rem';
-      tempDiv.appendChild(textBefore);
+      console.log('ExcelExport: HTML construido, intentando copiar al portapapeles...');
 
-      // Crear una tabla temporal con los datos actuales y estilos
-      const clonedTable = table.cloneNode(true) as HTMLElement;
-      
-      // Aplicar estilos inline a la tabla
-      clonedTable.style.width = '100%';
-      clonedTable.style.borderCollapse = 'collapse';
-      clonedTable.style.fontSize = '0.85rem';
-      clonedTable.style.background = 'white';
-      clonedTable.style.marginBottom = '1rem';
-      
-      // Aplicar estilos a thead
-      const thead = clonedTable.querySelector('thead');
-      if (thead) {
-        const theadTr = thead.querySelector('tr');
-        if (theadTr) {
-          (theadTr as HTMLElement).style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
-        }
-        const ths = thead.querySelectorAll('th');
-        ths.forEach(th => {
-          (th as HTMLElement).style.padding = '0.75rem 0.5rem';
-          (th as HTMLElement).style.border = '1px solid #e5e7eb';
-          (th as HTMLElement).style.fontWeight = '700';
-          (th as HTMLElement).style.color = '#000';
-          (th as HTMLElement).style.backgroundColor = '#fbbf24';
+      // Copiar al portapapeles con HTML
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': new Blob([htmlContent], { type: 'text/html' }),
+          'text/plain': new Blob([`Buenas, os envío una PR para su subida a PRO\n\n${incident.name}\nUn saludo, Gracias!`], { type: 'text/plain' })
+        })
+      ]);
+
+      console.log('ExcelExport: Copiado exitoso, abriendo Outlook...');
+
+      // Configurar mailto
+      const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
+      const to = encodeURIComponent('DL_DIGITALIZACION_PRODUCCION@REPSOL.COM');
+      const mailtoUrl = `mailto:${to}?subject=${subject}`;
+
+      console.log('ExcelExport: Mailto URL:', mailtoUrl);
+
+      // Intentar abrir con Electron primero
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.openOutlook) {
+        console.log('ExcelExport: Usando Electron API...');
+        (window as any).electronAPI.openOutlook({
+          to: 'DL_DIGITALIZACION_PRODUCCION@REPSOL.COM',
+          subject: '[Repsol EyG] PR to PROD',
+          body: htmlContent
         });
+      } else {
+        console.log('ExcelExport: Usando mailto fallback...');
+        // Fallback a mailto
+        const link = document.createElement('a');
+        link.href = mailtoUrl;
+        link.click();
       }
 
-      // Aplicar estilos a tbody
-      const tbody = clonedTable.querySelector('tbody');
-      if (tbody) {
-        const tds = tbody.querySelectorAll('td');
-        tds.forEach(td => {
-          (td as HTMLElement).style.padding = '0.75rem 0.5rem';
-          (td as HTMLElement).style.border = '1px solid #e5e7eb';
-          (td as HTMLElement).style.color = '#333';
-          (td as HTMLElement).style.fontWeight = '500';
-          (td as HTMLElement).style.backgroundColor = 'white';
-        });
-      }
-      
-      // Reemplazar el input de fecha con su valor
-      const dateInput = clonedTable.querySelector('input[type="date"]');
-      if (dateInput) {
-        const td = dateInput.parentElement;
-        if (td) {
-          td.textContent = deploymentDate || '-';
-          (td as HTMLElement).style.color = '#333';
-        }
-      }
-
-      // Reemplazar el textarea de descripción con su valor
-      const descTextarea = clonedTable.querySelector('textarea');
-      if (descTextarea) {
-        const td = descTextarea.parentElement;
-        if (td) {
-          td.textContent = incident.description || '-';
-          (td as HTMLElement).style.color = '#333';
-        }
-      }
-
-      tempDiv.appendChild(clonedTable);
-
-      // Texto después
-      const textAfter = document.createElement('p');
-      textAfter.textContent = 'Un saludo, Gracias!';
-      tempDiv.appendChild(textAfter);
-
-      document.body.appendChild(tempDiv);
-
-      // Seleccionar y copiar
-      const range = document.createRange();
-      range.selectNodeContents(tempDiv);
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-        document.execCommand('copy');
-        selection.removeAllRanges();
-      }
-
-      document.body.removeChild(tempDiv);
-      
-      alert('✓ Tabla copiada al portapapeles con formato');
+      console.log('ExcelExport: Proceso completado exitosamente');
+      alert('✓ Tabla copiada y Outlook abierto');
     } catch (error) {
-      console.error('Error al copiar:', error);
-      alert('✗ Error al copiar la tabla');
+      console.error('ExcelExport: Error en copyTableToClipboard:', error);
+      alert('✗ Error al copiar la tabla o abrir Outlook');
     }
   };
 

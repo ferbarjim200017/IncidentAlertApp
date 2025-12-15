@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
+const { exec } = require('child_process');
 const isDev = process.env.NODE_ENV === 'development';
 
 function createWindow() {
@@ -13,7 +14,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      devTools: isDev
+      devTools: isDev,
+      preload: path.join(__dirname, 'preload.js')
     },
     backgroundColor: '#1a1a2e',
     show: false,
@@ -54,4 +56,39 @@ app.whenReady().then(() => {
 // Salir cuando todas las ventanas estén cerradas (excepto en macOS)
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
+});
+
+// Handler para abrir Outlook con HTML
+ipcMain.handle('open-outlook', async (event, { to, subject, htmlBody }) => {
+  try {
+    if (process.platform === 'win32') {
+      // En Windows, usar PowerShell para crear correo con Outlook COM
+      const psScript = `
+        $outlook = New-Object -ComObject Outlook.Application
+        $mail = $outlook.CreateItem(0)
+        $mail.To = "${to}"
+        $mail.Subject = "${subject}"
+        $mail.HTMLBody = @"
+${htmlBody}
+"@
+        $mail.Display()
+      `;
+      
+      const command = `powershell.exe -Command "${psScript.replace(/"/g, '\\"')}"`;
+      exec(command, (error) => {
+        if (error) {
+          console.error('Error al abrir Outlook:', error);
+        }
+      });
+      
+      return { success: true };
+    } else {
+      // Fallback para otros sistemas
+      shell.openExternal(`mailto:${to}?subject=${encodeURIComponent(subject)}`);
+      return { success: false, message: 'Solo soportado en Windows con Outlook' };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { success: false, error: error.message };
+  }
 });
