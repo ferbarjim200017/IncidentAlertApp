@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { QATableExport } from './QATableExport';
-import { MainTableExport } from './MainTableExport';
 import './PRManager.css';
 
 interface PR {
@@ -225,13 +224,6 @@ export const PRManager: React.FC<PRManagerProps> = ({
                 <button type="submit" className="btn-submit-pr" style={{ flex: 1 }}>
                   {editingPR && editingPR.type === 'main' ? '💾 Guardar Cambios' : '✅ Agregar PR MAIN'}
                 </button>
-                {editingPR && editingPR.type === 'main' && (
-                  <MainTableExport 
-                    incidentName={incidentName}
-                    prMainList={[editingPR.pr]}
-                    contactPerson={ownerName}
-                  />
-                )}
               </div>
             </form>
           </div>
