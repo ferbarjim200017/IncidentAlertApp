@@ -110,7 +110,7 @@ export function QATableExport({ incidentName, prQA2List, ownerName }: QATableExp
       // Abrir Outlook con el correo
       const subject = encodeURIComponent('[Repsol EyG] PR to QA');
       const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
-      const body = encodeURIComponent('Buenas, os envío una PR para su subida a QA:\n\n(Pega aquí la tabla copiada)\n\nGracias, un saludo!');
+      const body = encodeURIComponent('Buenas, os envío una PR para su subida a QA:\n\n[Pega aquí la tabla que se ha copiado al portapapeles]\n\nGracias, un saludo!');
       
       window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
       
