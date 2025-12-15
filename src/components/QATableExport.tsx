@@ -106,8 +106,15 @@ export function QATableExport({ incidentName, prQA2List, ownerName }: QATableExp
       }
 
       document.body.removeChild(tempDiv);
+
+      // Abrir Outlook con el correo
+      const subject = encodeURIComponent('[Repsol EyG] PR to QA');
+      const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
+      const body = encodeURIComponent('Buenas, os envío una PR para su subida a QA:\n\n(Pega aquí la tabla copiada)\n\nGracias, un saludo!');
       
-      alert('✓ Tabla QA copiada al portapapeles con formato');
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      
+      alert('✓ Tabla QA copiada al portapapeles. Outlook se abrirá automáticamente.');
     } catch (error) {
       console.error('Error al copiar:', error);
       alert('✗ Error al copiar la tabla');
