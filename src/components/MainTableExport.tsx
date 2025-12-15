@@ -216,6 +216,7 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          console.log('MainTableExport: Abriendo modal MAIN');
           setShowModal(true);
         }}
         title="Ver tabla MAIN"
