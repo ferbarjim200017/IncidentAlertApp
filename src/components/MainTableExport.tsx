@@ -156,6 +156,20 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
 
   return (
     <>
+      <button 
+        type="button"
+        className="btn-main-export"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('MainTableExport: Abriendo modal MAIN');
+          setShowModal(true);
+        }}
+        title="Ver tabla MAIN para envío"
+      >
+        📋 Copiar Tabla
+      </button>
+
       {showModal && createPortal(
         <div className="main-modal-overlay" onClick={() => setShowModal(false)}>
           <div className="main-modal" onClick={(e) => e.stopPropagation()}>
@@ -209,20 +223,6 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
         </div>,
         document.body
       )}
-
-      <button 
-        type="button"
-        className="btn-main-export"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('MainTableExport: Abriendo modal MAIN');
-          setShowModal(true);
-        }}
-        title="Ver tabla MAIN"
-      >
-        📋 Tabla MAIN
-      </button>
     </>
   );
 }
