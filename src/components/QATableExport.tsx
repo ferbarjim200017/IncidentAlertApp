@@ -144,8 +144,14 @@ export function QATableExport({ incidentName, prQA2List, ownerName }: QATableExp
         }
       }
       
-      // Fallback: usar mailto (funciona en navegador y Electron)
-      window.location.href = `mailto:${to}?subject=${subject}`;
+      // Fallback: usar mailto con un elemento <a> temporal
+      const mailtoLink = document.createElement('a');
+      mailtoLink.href = `mailto:${to}?subject=${subject}`;
+      mailtoLink.style.display = 'none';
+      document.body.appendChild(mailtoLink);
+      mailtoLink.click();
+      document.body.removeChild(mailtoLink);
+      
       alert('✓ Tabla copiada al portapapeles.\n\nOutlook se abrirá con el correo preparado.\nPega la tabla con Ctrl+V en el cuerpo del correo.');
     } catch (error) {
       console.error('Error al copiar:', error);
