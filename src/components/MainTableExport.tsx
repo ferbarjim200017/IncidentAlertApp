@@ -47,11 +47,12 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
       // Clonar tabla con estilos
       const clonedTable = table.cloneNode(true) as HTMLElement;
       
-      clonedTable.style.width = '100%';
+      clonedTable.style.width = 'auto';
       clonedTable.style.borderCollapse = 'collapse';
-      clonedTable.style.fontSize = '0.85rem';
+      clonedTable.style.fontSize = '11pt';
       clonedTable.style.background = 'white';
       clonedTable.style.marginBottom = '1rem';
+      clonedTable.style.fontFamily = 'Calibri, Arial, sans-serif';
       
       // Aplicar estilos a thead
       const thead = clonedTable.querySelector('thead');
@@ -62,11 +63,12 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
         }
         const ths = thead.querySelectorAll('th');
         ths.forEach(th => {
-          (th as HTMLElement).style.padding = '0.75rem 0.5rem';
+          (th as HTMLElement).style.padding = '8px 12px';
           (th as HTMLElement).style.border = '1px solid #e5e7eb';
           (th as HTMLElement).style.fontWeight = '700';
           (th as HTMLElement).style.color = '#fff';
           (th as HTMLElement).style.backgroundColor = '#10b981';
+          (th as HTMLElement).style.whiteSpace = 'nowrap';
         });
       }
 
@@ -75,11 +77,12 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
       if (tbody) {
         const tds = tbody.querySelectorAll('td');
         tds.forEach(td => {
-          (td as HTMLElement).style.padding = '0.75rem 0.5rem';
+          (td as HTMLElement).style.padding = '8px 12px';
           (td as HTMLElement).style.border = '1px solid #e5e7eb';
           (td as HTMLElement).style.color = '#333';
-          (td as HTMLElement).style.fontWeight = '500';
+          (td as HTMLElement).style.fontWeight = '400';
           (td as HTMLElement).style.backgroundColor = 'white';
+          (td as HTMLElement).style.whiteSpace = 'nowrap';
         });
       }
 
@@ -114,15 +117,29 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
         }
       }
 
+      const htmlContent = tempDiv.innerHTML;
       document.body.removeChild(tempDiv);
 
-      // Abrir Outlook con el correo
-      const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
-      const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
-      
-      window.location.href = `mailto:${to}?subject=${subject}`;
-      
-      alert('✓ Tabla MAIN copiada con formato HTML. Pégala directamente en Outlook con Ctrl+V.');
+      // Intentar abrir Outlook con la API de Electron
+      if ((window as any).electronAPI) {
+        const result = await (window as any).electronAPI.openOutlook({
+          to: 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com',
+          subject: '[Repsol EyG] PR to PROD',
+          htmlBody: htmlContent
+        });
+        
+        if (result.success) {
+          alert('✓ Correo abierto en Outlook con la tabla incluida.');
+        } else {
+          alert('✓ Tabla copiada. Pégala en Outlook con Ctrl+V.');
+        }
+      } else {
+        // Fallback: abrir mailto
+        const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
+        const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
+        window.location.href = `mailto:${to}?subject=${subject}`;
+        alert('✓ Tabla copiada. Pégala en Outlook con Ctrl+V.');
+      }
     } catch (error) {
       console.error('Error al copiar:', error);
       alert('✗ Error al copiar la tabla');
