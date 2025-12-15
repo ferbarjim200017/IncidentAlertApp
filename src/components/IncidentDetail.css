@@ -1,7 +1,7 @@
 .incident-detail-container {
-  padding: 2rem 1.5rem;
+  padding: 2rem 1.5rem 0;
   max-width: 100%;
-  height: calc(100vh - 180px);
+  height: 100%;
   overflow: hidden;
   position: relative;
   z-index: 5;
