@@ -119,26 +119,31 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
 
       document.body.removeChild(tempDiv);
 
-      // Intentar abrir Outlook con la API de Electron
+      // Abrir Outlook usando mailto
+      const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
+      const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
+      
+      // Intentar abrir con la API de Electron primero
       if ((window as any).electronAPI) {
-        const result = await (window as any).electronAPI.openOutlook({
-          to: 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com',
-          subject: '[Repsol EyG] PR to PROD',
-          htmlBody: htmlContent
-        });
-        
-        if (result.success) {
-          alert('✓ Correo abierto en Outlook con la tabla incluida.');
-        } else {
-          alert('✓ Tabla copiada. Pégala en Outlook con Ctrl+V.');
+        try {
+          const result = await (window as any).electronAPI.openOutlook({
+            to: to,
+            subject: '[Repsol EyG] PR to PROD',
+            htmlBody: htmlContent
+          });
+          
+          if (result.success) {
+            alert('✓ Correo abierto en Outlook con la tabla incluida.');
+            return;
+          }
+        } catch (e) {
+          console.log('Electron API no disponible, usando mailto');
         }
-      } else {
-        // Fallback: abrir mailto
-        const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
-        const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
-        window.location.href = `mailto:${to}?subject=${subject}`;
-        alert('✓ Tabla copiada. Pégala en Outlook con Ctrl+V.');
       }
+      
+      // Fallback: usar mailto (funciona en navegador y Electron)
+      window.location.href = `mailto:${to}?subject=${subject}`;
+      alert('✓ Tabla copiada al portapapeles.\n\nOutlook se abrirá con el correo preparado.\nPega la tabla con Ctrl+V en el cuerpo del correo.');
     } catch (error) {
       console.error('Error al copiar:', error);
       alert('✗ Error al copiar la tabla');
