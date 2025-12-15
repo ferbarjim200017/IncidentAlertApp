@@ -92,15 +92,26 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
 
       document.body.appendChild(tempDiv);
 
-      // Seleccionar y copiar
-      const range = document.createRange();
-      range.selectNodeContents(tempDiv);
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-        document.execCommand('copy');
-        selection.removeAllRanges();
+      // Copiar como HTML usando Clipboard API
+      try {
+        const htmlContent = tempDiv.innerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const clipboardItem = new ClipboardItem({
+          'text/html': blob,
+          'text/plain': new Blob([tempDiv.textContent || ''], { type: 'text/plain' })
+        });
+        await navigator.clipboard.write([clipboardItem]);
+      } catch (clipError) {
+        // Fallback al método antiguo si Clipboard API falla
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(range);
+          document.execCommand('copy');
+          selection.removeAllRanges();
+        }
       }
 
       document.body.removeChild(tempDiv);
@@ -108,11 +119,10 @@ export function MainTableExport({ incidentName, prMainList, contactPerson }: Mai
       // Abrir Outlook con el correo
       const subject = encodeURIComponent('[Repsol EyG] PR to PROD');
       const to = 'Repsol.EyG.Retail.Salesforce.ReleaseManagers@accenture.com';
-      const body = encodeURIComponent('Buenas, os envío una PR para su subida a PRO:\n\n[Pega aquí la tabla que se ha copiado al portapapeles]\n\nGracias, un saludo!');
       
-      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:${to}?subject=${subject}`;
       
-      alert('✓ Tabla MAIN copiada al portapapeles. Outlook se abrirá automáticamente.');
+      alert('✓ Tabla MAIN copiada con formato HTML. Pégala directamente en Outlook con Ctrl+V.');
     } catch (error) {
       console.error('Error al copiar:', error);
       alert('✗ Error al copiar la tabla');
